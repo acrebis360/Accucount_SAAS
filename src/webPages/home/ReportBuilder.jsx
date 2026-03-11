@@ -256,7 +256,9 @@ import {
   Truck,
   Link2,
   Shield,
-  TrendingDown
+  TrendingDown,
+  User,
+  Building
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -638,7 +640,7 @@ const ReportBuilderPage = () => {
     { id: 'sku', name: 'SKU', icon: Hash },
     { id: 'batch', name: 'Batch', icon: Layers },
     { id: 'status', name: 'Status', icon: Activity },
-    { id: 'user', name: 'User', icon: Users },
+    { id: 'user', name: 'User', icon: User },
     { id: 'role', name: 'Role', icon: User },
     { id: 'department', name: 'Department', icon: Building },
   ];
