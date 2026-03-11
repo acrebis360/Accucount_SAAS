@@ -20,22 +20,12 @@ import {
   Users,
   Store,
   Package,
-  BarChart3,
   Download,
-  Upload,
   Printer,
   Mail,
-  Share2,
-  Grid,
   List,
-  X,
-  ChevronDown,
   ChevronRight,
   ChevronLeft,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  Check,
   Ban,
   FileText,
   FileSpreadsheet,
@@ -46,11 +36,6 @@ import {
   CalendarSync,
   Clock as ClockIcon,
   PlayCircle,
-  PauseCircle,
-  Hourglass,
-  HourglassIcon,
-  Sandbox,
-  TimerIcon,
   Target,
   FileCheck
 } from 'lucide-react';
@@ -75,7 +60,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -84,13 +68,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
@@ -105,24 +85,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '@/components/ui/command';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';

@@ -151,7 +151,7 @@ const menuSections = [
       { label: 'Manage Stocktake', icon: ClipboardList, path: '/dashboard/stocktake/manage' },
       { label: 'Stock Take Scheduler', icon: Calendar, path: '/dashboard/stocktake/scheduler' },
       { label: 'Manage User Group', icon: Users2, path: '/dashboard/stocktake/user-group' },
-      { label: 'Manage Store Group', icon: Store, path: '/dashboard/manage-store-group' },
+      { label: 'Manage Store Group', icon: Store, path: '/dashboard/stocktake/store-group' },
     ]
   },
   {
