@@ -88,7 +88,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-[#F5EEE9] px-6">
+    <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-black px-6">
 
 
       <div className="flex-1">
@@ -103,12 +103,12 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-white">
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleFullscreen}
-          className="hidden lg:flex"
+          className="hidden lg:flex "
         >
           {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
         </Button>

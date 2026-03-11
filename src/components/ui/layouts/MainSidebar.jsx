@@ -419,7 +419,7 @@ const menuSections = [
 
   return (
     <aside className={cn(
-      "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col border-r border-[#F5EEE9]", // Changed border to #F5EEE9
+      "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col ", // Changed border to #F5EEE9
       isOpen ? "w-75" : "w-14"
     )}>
       {/* Header Section with animation */}
@@ -429,8 +429,8 @@ const menuSections = [
       )}>
         {isOpen && (
           <span className="text-3xl font-semibold tracking-tight animate-in fade-in slide-in-from-left-2 duration-300 truncate">
-            <span className="text-red-600">ACCU</span>
-            <span className="text-white">COUNT</span>
+            <span className="text-red-600 tracking-wider">ACCU</span>
+            <span className="text-white tracking-wider">COUNT</span>
           </span>
         )}
         <Button
