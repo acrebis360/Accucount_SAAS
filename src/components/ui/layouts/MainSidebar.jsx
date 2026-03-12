@@ -184,7 +184,7 @@ const menuSections = [
       { label: 'Putaway Rules', icon: ArrowDown, path: '/dashboard/putaway-rules' },
       { label: 'Picking Lists', icon: List, path: '/dashboard/picking-lists' },
       { label: 'Packing Stations', icon: Package, path: '/dashboard/packing-stations' },
-      { label: 'Shipping Management', icon: Truck, path: '/dashboard/shipping' },
+      { label: 'Shipping Management', icon: Truck, path: '/dashboard/shipping-management' },
       { label: 'Receiving', icon: ArrowDownCircle, path: '/dashboard/receiving' },
     ]
   },
