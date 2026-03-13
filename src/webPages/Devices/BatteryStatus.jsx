@@ -49,6 +49,7 @@ import {
   Laptop,
   Scan,
   Watch,
+  History,
 } from 'lucide-react';
 
 // Shadcn UI imports
