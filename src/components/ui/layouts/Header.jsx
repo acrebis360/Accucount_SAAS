@@ -91,13 +91,13 @@ const Header = () => {
     <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-black px-6">
 
 
-      <div className="flex-1">
+      <div className="flex-1 flex justify-end">
         <div className="relative max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
             placeholder="Search..."
-            className="w-full bg-gray-50 pl-8 md:w-[300px] lg:w-[400px]"
+            className="w-full bg-gray-50 pl-8 md:w-[200px] lg:w-[250px]"
           />
          
         </div>
