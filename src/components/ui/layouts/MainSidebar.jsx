@@ -97,7 +97,15 @@ import {
   FileText as FileTextIcon,
   Settings as SettingsIcon,
   Activity as ActivityIcon,
-  Users as UsersIcon
+  Users as UsersIcon,
+  
+  // Icons for Dashboard submenu
+  CalendarDays,
+  Calculator,
+  Wrench as WrenchIcon,
+  CheckCircle2,
+  Users as UsersIcon2,
+  FileText as FileTextIcon2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -109,6 +117,7 @@ const MainSidebar = ({ isOpen, onToggle }) => {
   const [expandedSections, setExpandedSections] = useState({});
   const [hoveredSection, setHoveredSection] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [expandedDashboard, setExpandedDashboard] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -131,7 +140,29 @@ const MainSidebar = ({ isOpen, onToggle }) => {
       }
     });
     setExpandedSections(newExpandedSections);
+    
+    // Auto-expand Dashboard if any submenu item is active
+    const dashboardSubmenuPaths = [
+      '/dashboard/event-dashboard',
+      '/dashboard/count',
+      '/dashboard/audit-fix',
+      '/dashboard/closeout',
+      '/dashboard/event-report'
+    ];
+    if (dashboardSubmenuPaths.includes(pathname)) {
+      setExpandedDashboard(true);
+    }
   }, [pathname]);
+
+  // Dashboard submenu items
+  const dashboardSubmenuItems = [
+    { label: 'Event Dashboard', icon: CalendarDays, path: '/dashboard/event-dashboard' },
+    { label: 'Count', icon: Calculator, path: '/dashboard/count' },
+    { label: 'Fix', icon: WrenchIcon, path: '/dashboard/audit-fix' },
+    { label: 'Close Out', icon: CheckCircle2, path: '/dashboard/closeout' },
+    { label: 'Team', icon: UsersIcon2, path: '/dashboard/team' },
+    { label: 'Event Report', icon: FileTextIcon2, path: '/dashboard/event-report' },
+  ];
 
   // Menu structure exactly as you specified
 const menuSections = [
@@ -329,15 +360,15 @@ const menuSections = [
         <div className={cn(
           "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
           isActive 
-            ? "bg-red-600 text-white shadow-md" // Changed to red-600 for active items
+            ? "bg-red-600 text-white shadow-md"
             : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
           !isOpen && "justify-center px-2"
         )}>
           <Icon size={18} className={cn(
             "transition-transform duration-200 flex-shrink-0",
             isActive 
-              ? "text-white" // White icon on red background
-              : "text-red-600", // Red-600 icons for non-active items
+              ? "text-white"
+              : "text-red-600",
             !isActive && "group-hover:rotate-3 group-hover:scale-110"
           )} />
           {isOpen && (
@@ -367,14 +398,14 @@ const menuSections = [
           onMouseEnter={() => setHoveredSection(section.title)}
           onMouseLeave={() => setHoveredSection(null)}
           className={cn(
-            "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer w-[90%]",
-            "text-black hover:bg-[#F5EEE9] hover:shadow-sm", // Changed to #F5EEE9 on hover
+            "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer w-[100%]",
+            "text-black hover:bg-[#F5EEE9] hover:shadow-sm",
             !isOpen && "justify-center px-2",
-            hasActiveChild && !isExpanded && "bg-[#F5EEE9]" // Using #F5EEE9 for active parent
+            hasActiveChild && !isExpanded && "bg-[#F5EEE9]"
           )}
         >
           <SectionIcon size={18} className={cn(
-            "transition-all duration-200 flex-shrink-0 text-red-600", // All section icons red-600
+            "transition-all duration-200 flex-shrink-0 text-red-600",
             isHovered && "scale-110",
             hasActiveChild && !isExpanded && "text-red-600"
           )} />
@@ -382,7 +413,7 @@ const menuSections = [
             <>
               <span className={cn(
                 "flex-1 text-sm font-semibold tracking-wide transition-all duration-200 truncate",
-                hasActiveChild && !isExpanded && "text-red-600" // Changed to red-600 for active parent
+                hasActiveChild && !isExpanded && "text-red-600"
               )}>
                 {section.title}
               </span>
@@ -391,23 +422,103 @@ const menuSections = [
                 isExpanded ? "rotate-180" : "rotate-0"
               )}>
                 {isExpanded ? (
-                  <ChevronDown size={14} className="text-black" /> // Changed to black
+                  <ChevronDown size={14} className="text-black" />
                 ) : (
-                  <ChevronRightIcon size={14} className="text-black" /> // Changed to black
+                  <ChevronRightIcon size={14} className="text-black" />
                 )}
               </div>
             </>
           )}
         </div>
 
-        {/* Section Items with animation - Fixed overflow */}
+        {/* Section Items with animation */}
         {isOpen && (
           <div className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out w-[90%] ",
+            "overflow-hidden transition-all duration-300 ease-in-out w-[100%]",
             isExpanded ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
           )}>
             <div className="pl-4 pr-2 space-y-1 w-full">
-              {section.items.map(item => renderMenuItem(item))}
+              {section.items.map(item => {
+                // Special handling for Dashboard item in Home section
+                if (section.title === 'Home' && item.label === 'Dashboard') {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.path;
+                  
+                  return (
+                    <div key={item.path}>
+                      <div
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setExpandedDashboard(!expandedDashboard);
+                        }}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+                          isActive 
+                            ? "bg-red-600 text-white shadow-md"
+                            : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+                        )}
+                      >
+                        <Icon size={18} className={cn(
+                          "transition-transform duration-200 flex-shrink-0",
+                          isActive 
+                            ? "text-white"
+                            : "text-red-600",
+                          !isActive && "group-hover:rotate-3 group-hover:scale-110"
+                        )} />
+                        <span className={cn(
+                          "flex-1 text-sm truncate transition-all duration-200",
+                          !isActive && "group-hover:translate-x-0.5"
+                        )}>
+                          {item.label}
+                        </span>
+                        <div className={cn(
+                          "transition-all duration-300 ease-in-out",
+                          expandedDashboard ? "rotate-180" : "rotate-0"
+                        )}>
+                          <ChevronDown size={14} className={isActive ? "text-white" : "text-black"} />
+                        </div>
+                      </div>
+                      
+                      {/* Dashboard Submenu Items */}
+                      {expandedDashboard && (
+                        <div className="mt-1 space-y-1 pl-4">
+                          {dashboardSubmenuItems.map(subItem => {
+                            const SubIcon = subItem.icon;
+                            const isSubActive = pathname === subItem.path;
+                            return (
+                              <Link href={subItem.path} key={subItem.path} className="block w-full">
+                                <div className={cn(
+                                  "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+                                  isSubActive 
+                                    ? "bg-red-600 text-white shadow-md"
+                                    : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+                                )}>
+                                  <SubIcon size={16} className={cn(
+                                    "transition-transform duration-200 flex-shrink-0",
+                                    isSubActive 
+                                      ? "text-white"
+                                      : "text-red-600",
+                                    !isSubActive && "group-hover:rotate-3 group-hover:scale-110"
+                                  )} />
+                                  <span className={cn(
+                                    "flex-1 text-sm truncate transition-all duration-200",
+                                    !isSubActive && "group-hover:translate-x-0.5"
+                                  )}>
+                                    {subItem.label}
+                                  </span>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
+                // Render other items normally
+                return renderMenuItem(item);
+              })}
             </div>
           </div>
         )}
@@ -419,12 +530,12 @@ const menuSections = [
 
   return (
     <aside className={cn(
-      "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col ", // Changed border to #F5EEE9
-      isOpen ? "w-75" : "w-14"
+      "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col",
+      isOpen ? "w-65" : "w-14"
     )}>
       {/* Header Section with animation */}
       <div className={cn(
-        "flex h-14 items-center flex-shrink-0 border-b border-[#F5EEE9] transition-all duration-300 bg-black", // Changed border to #F5EEE9
+        "flex h-14 items-center flex-shrink-0 border-b border-[#F5EEE9] transition-all duration-300 bg-black",
         isOpen ? "justify-between px-4" : "justify-center"
       )}>
         {isOpen && (
@@ -438,7 +549,7 @@ const menuSections = [
           size="icon"
           onClick={onToggle}
           className={cn(
-            "text-black hover:bg-[#F5EEE9] transition-all duration-200 hover:scale-110 hover:rotate-3 h-7 w-7 flex-shrink-0", // Changed hover to #F5EEE9
+            "text-black hover:bg-[#F5EEE9] transition-all duration-200 hover:scale-110 hover:rotate-3 h-7 w-7 flex-shrink-0",
             !isOpen && "mx-auto"
           )}
         >
@@ -446,7 +557,7 @@ const menuSections = [
             "transition-transform duration-300",
             isOpen ? "rotate-0" : "rotate-180"
           )}>
-            {isOpen ? <ChevronLeft size={16} className="text-red-600" /> : <ChevronRight size={16} className="text-red-600" />} {/* Chevrons red-600 */}
+            {isOpen ? <ChevronLeft size={16} className="text-red-600" /> : <ChevronRight size={16} className="text-red-600" />}
           </div>
         </Button>
       </div>
@@ -466,7 +577,7 @@ const menuSections = [
                   {!isOpen && (
                     <TooltipContent 
                       side="right" 
-                      className="animate-in fade-in slide-in-from-left-1 duration-200 text-sm bg-black text-white border-none" // Black background for tooltips
+                      className="animate-in fade-in slide-in-from-left-1 duration-200 text-sm bg-black text-white border-none"
                     >
                       <span className="font-semibold">{section.title}</span>
                     </TooltipContent>
@@ -479,10 +590,10 @@ const menuSections = [
 
         {/* Footer with animation */}
         {isOpen && (
-          <div className="p-3 border-t border-[#F5EEE9] animate-in fade-in slide-in-from-bottom-2 duration-300 flex-shrink-0"> {/* Changed border to #F5EEE9 */}
+          <div className="p-3 border-t border-[#F5EEE9] animate-in fade-in slide-in-from-bottom-2 duration-300 flex-shrink-0">
             <div className="flex items-center gap-1.5 text-xs">
               <span className="text-black">v2.0.0</span>
-              <span className="text-red-600">Updated</span> {/* Changed to red-600 */}
+              <span className="text-red-600">Updated</span>
             </div>
           </div>
         )}
