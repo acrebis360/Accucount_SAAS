@@ -1,4 +1,3 @@
-'use client'
 import { Suspense } from 'react';
 import Count from '@/webPages/Count/Count';
 
