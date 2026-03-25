@@ -49,6 +49,8 @@ import {
   Package,
   Hash,
   Sliders,
+  Map as MapIcon,
+  Thermometer,
   
   // New icons for Warehouse Management
   Warehouse,
@@ -105,7 +107,31 @@ import {
   Wrench as WrenchIcon,
   CheckCircle2,
   Users as UsersIcon2,
-  FileText as FileTextIcon2
+  FileText as FileTextIcon2,
+  
+  // New icons for new menus
+  History,
+  AlertCircle,
+  MapPin,
+  QrCode,
+  Play,
+  CheckSquare,
+  Eye,
+  GitBranch,
+  TrendingUp as TrendingUpIcon,
+  BarChart as BarChartIcon,
+  Smartphone,
+  Server,
+  HardDrive,
+  Shield as ShieldIcon,
+  Globe,
+  BookOpen as BookOpenIcon,
+  Users as UsersIcon3,
+  CreditCard,
+  Lock,
+  Server as ServerIcon,
+  Database as DatabaseIcon,
+  PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -118,6 +144,11 @@ const MainSidebar = ({ isOpen, onToggle }) => {
   const [hoveredSection, setHoveredSection] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [expandedDashboard, setExpandedDashboard] = useState(false);
+  const [expandedStockTakeSetup, setExpandedStockTakeSetup] = useState(false);
+  const [expandedStockTakePlan, setExpandedStockTakePlan] = useState(false);
+  const [expandedStockTakeExecute, setExpandedStockTakeExecute] = useState(false);
+  const [expandedStockTakeReview, setExpandedStockTakeReview] = useState(false);
+  const [expandedStockTakeReconciliation, setExpandedStockTakeReconciliation] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -164,29 +195,19 @@ const MainSidebar = ({ isOpen, onToggle }) => {
     { label: 'Event Report', icon: FileTextIcon2, path: '/dashboard/event-report' },
   ];
 
-  // Menu structure exactly as you specified
+  // Menu structure with all new items added at the start
 const menuSections = [
   {
-    title: 'Home',
+    title: 'HOME',
     icon: Home,
     items: [
       { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-      { label: 'Reports', icon: FileText, path: '/dashboard/reports' },
-      { label: 'Report Builder', icon: BarChart, path: '/dashboard/report-builder' },
+      { label: 'Stock Take History', icon: History, path: '/dashboard/stocktake-history' },
+      { label: 'Notifications & Alerts', icon: AlertCircle, path: '/dashboard/notifications' },
     ]
   },
   {
-    title: 'Activities',
-    icon: Activity,
-    items: [
-      { label: 'Manage Stocktake', icon: ClipboardList, path: '/dashboard/stocktake/manage' },
-      { label: 'Stock Take Scheduler', icon: Calendar, path: '/dashboard/stocktake/scheduler' },
-      { label: 'Manage User Group', icon: Users2, path: '/dashboard/stocktake/user-group' },
-      { label: 'Manage Store Group', icon: Store, path: '/dashboard/stocktake/store-group' },
-    ]
-  },
-  {
-    title: 'Inventory Management',
+    title: 'INVENTORY',
     icon: Package,
     items: [
       { label: 'Physical Inventory', icon: ClipboardList, path: '/dashboard/physical-inventory' },
@@ -195,36 +216,58 @@ const menuSections = [
       { label: 'Batch Tracking', icon: Layers, path: '/dashboard/batch-tracking' },
       { label: 'Serial Numbers', icon: Hash, path: '/dashboard/serial-numbers' },
       { label: 'Expiry Management', icon: Calendar, path: '/dashboard/expiry-management' },
-      { label: 'Inventory Adjustments', icon: Sliders, path: '/dashboard/inventory-adjustments' },
+      { label: 'Inventory Map', icon: MapIcon, path: '/dashboard/inventory-map' },
     ]
   },
   {
-    title: 'Asset Management',
-    icon: Briefcase,
+    title: 'STOCK TAKE',
+    icon: ClipboardList,
     items: [
-      { label: 'Asset Depository', icon: Database, path: '/dashboard/asset-depository' },
-      { label: 'Asset Transfers', icon: Repeat, path: '/dashboard/asset-transfers' },
+      { label: 'Setup', icon: Settings, submenu: [
+        { label: 'Locations', icon: MapPin, path: '/dashboard/locations' },
+        { label: 'Item Master Management', icon: Database, path: '/dashboard/item-master' },
+        { label: 'Report Management', icon: FileText, path: '/dashboard/report-management' },
+        { label: 'Bar Code / QR Generator', icon: QrCode, path: '/dashboard/barcode-generator' },
+      ]},
+      { label: 'Plan', icon: Calendar, submenu: [
+        { label: 'Event Scheduling', icon: Calendar, path: '/dashboard/stocktake/event-scheduling' },
+        { label: 'Event Setup', icon: Settings, path: '/dashboard/stocktake/event-setup' },
+      ]},
+      { label: 'Execute (LIVE)', icon: Play, submenu: [
+        { label: 'Live & Upcoming Events', icon: LayoutDashboard, path: '/dashboard/live-dashboard' },
+        { label: 'Event Dashboard', icon: CalendarDays, path: '/dashboard/event-dashboard' },
+        { label: 'Count', icon: Calculator, path: '/dashboard/count' },
+        { label: 'Fix', icon: WrenchIcon, path: '/dashboard/audit-fix' },
+        { label: 'Validation', icon: CheckCircle, path: '/dashboard/validation' },
+        { label: 'Close Out', icon: CheckCircle2, path: '/dashboard/closeout' },
+      ]},
+      { label: 'Review & Control', icon: Eye, submenu: [
+        { label: 'Team Productivity', icon: Users, path: '/dashboard/team-productivity' },
+        { label: 'Discrepancy Dashboard', icon: AlertTriangle, path: '/dashboard/discrepancy-dashboard' },
+        { label: 'Event Reports', icon: FileText, path: '/dashboard/event-reports' },
+      ]},
+      { label: 'Reconciliation', icon: GitBranch, submenu: [
+        { label: 'Reconciliation Workspace', icon: LayoutDashboard, path: '/dashboard/reconciliation-workspace' },
+        { label: 'Adjustment Preview', icon: Eye, path: '/dashboard/adjustment-preview' },
+        { label: 'Approval Workflow', icon: CheckSquare, path: '/dashboard/approval-workflow' },
+        { label: 'Inventory Adjustment Posting', icon: RefreshCw, path: '/dashboard/adjustment-posting' },
+      ]},
     ]
   },
   {
-    title: 'Warehouse Management',
-    icon: Warehouse,
+    title: 'INSIGHTS & REPORTING',
+    icon: BarChart3,
     items: [
-      { label: 'Warehouse Zones', icon: Grid, path: '/dashboard/warehouse-zones' },
-      { label: 'Bin Locations', icon: Map, path: '/dashboard/bin-locations' },
-      { label: 'Putaway Rules', icon: ArrowDown, path: '/dashboard/putaway-rules' },
-      { label: 'Picking Lists', icon: List, path: '/dashboard/picking-lists' },
-      { label: 'Packing Stations', icon: Package, path: '/dashboard/packing-stations' },
-      { label: 'Shipping Management', icon: Truck, path: '/dashboard/shipping-management' },
-      { label: 'Receiving', icon: ArrowDownCircle, path: '/dashboard/receiving' },
+      { label: 'Analytics Dashboard', icon: LayoutDashboard, path: '/dashboard/analytics-dashboard' },
+      { label: 'Stock Take History', icon: History, path: '/dashboard/stocktake-history-report' },
+      { label: 'Custom Reports', icon: FileText, path: '/dashboard/custom-reports' },
     ]
   },
   {
-    title: 'IoT & Devices',
-    icon: Cpu,
+    title: 'DEVICE MANAGEMENT',
+    icon: Smartphone,
     items: [
       { label: 'Connected Devices', icon: Radio, path: '/dashboard/connected-devices' },
-      { label: 'RFID Scanners', icon: Scan, path: '/dashboard/rfid-scanners' },
       { label: 'IoT Gateway Status', icon: Wifi, path: '/dashboard/iot-gateway' },
       { label: 'Device Health', icon: Activity, path: '/dashboard/device-health' },
       { label: 'Battery Status', icon: Battery, path: '/dashboard/battery-status' },
@@ -232,76 +275,7 @@ const menuSections = [
     ]
   },
   {
-    title: 'Communications',
-    icon: MessageSquare,
-    items: [
-      { label: 'Notice Board', icon: Bell, path: '/dashboard/notice-board' },
-      { label: 'Announcements', icon: Megaphone, path: '/dashboard/announcements' },
-      { label: 'Messages', icon: Mail, path: '/dashboard/messages' },
-      { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
-    ]
-  },
-  {
-    title: 'Learning Management',
-    icon: BookOpen,
-    items: [
-      { label: 'Trainings', icon: GraduationCap, path: '/dashboard/trainings' },
-      { label: 'Library', icon: Library, path: '/dashboard/library' },
-      { label: 'AI Bot / FAQ', icon: Bot, path: '/dashboard/ai-bot' },
-      { label: 'Learning Paths', icon: Map, path: '/dashboard/learning-paths' },
-      { label: 'Certifications', icon: Award, path: '/dashboard/certifications' },
-    ]
-  },
-  {
-    title: 'Quality Control',
-    icon: ShieldCheck,
-    items: [
-      { label: 'Quality Checks', icon: CheckCircle, path: '/dashboard/quality-checks' },
-      { label: 'Inspection Reports', icon: FileText, path: '/dashboard/inspection-reports' },
-      { label: 'Defect Tracking', icon: AlertTriangle, path: '/dashboard/defect-tracking' },
-      { label: 'Return Management', icon: RotateCcw, path: '/dashboard/returns' },
-      { label: 'RMA Processing', icon: RefreshCw, path: '/dashboard/rma-processing' },
-    ]
-  },
-  {
-    title: 'Supplier Management',
-    icon: Truck,
-    items: [
-      { label: 'Vendors', icon: Building, path: '/dashboard/vendors' },
-      { label: 'Purchase Orders', icon: FileText, path: '/dashboard/purchase-orders' },
-      { label: 'Supplier Performance', icon: TrendingUp, path: '/dashboard/supplier-performance' },
-      { label: 'Contract Management', icon: FileCheck, path: '/dashboard/contracts' },
-      { label: 'Reorder Automation', icon: Repeat, path: '/dashboard/reorder-automation' },
-    ]
-  },
-  {
-    title: 'Analytics & Insights',
-    icon: BarChart3,
-    items: [
-      { label: 'Inventory Forecasting', icon: TrendingUp, path: '/dashboard/forecasting' },
-      { label: 'Demand Planning', icon: Calendar, path: '/dashboard/demand-planning' },
-      { label: 'Trend Analysis', icon: LineChart, path: '/dashboard/trend-analysis' },
-      { label: 'Performance Metrics', icon: BarChart, path: '/dashboard/performance-metrics' },
-      { label: 'AI Predictions', icon: Bot, path: '/dashboard/ai-predictions' },
-      { label: 'Custom Dashboards', icon: LayoutDashboard, path: '/dashboard/custom-dashboards' },
-    ]
-  },
-  {
-    title: 'Administration',
-    icon: Settings,
-    items: [
-      { label: 'Organization', icon: Building, path: '/dashboard/organization' },
-      { label: 'Users', icon: Users, path: '/dashboard/users' },
-      { label: 'Roles', icon: User, path: '/dashboard/roles' },
-      { label: 'Masters', icon: Layers, path: '/dashboard/masters' },
-      { label: 'My Requests', icon: FileCheck, path: '/dashboard/my-requests' },
-      { label: 'My Subscriptions', icon: Crown, path: '/dashboard/my-subscriptions' },
-      { label: 'My Billing History', icon: Receipt, path: '/dashboard/my-billing' },
-      { label: 'Audit Logs', icon: FileText, path: '/dashboard/audit-logs' },
-    ]
-  },
-  {
-    title: 'Integration',
+    title: 'INTEGRATION',
     icon: Link2,
     items: [
       { label: 'My API Keys', icon: Key, path: '/dashboard/api-keys' },
@@ -313,42 +287,52 @@ const menuSections = [
     ]
   },
   {
-    title: 'Tenant Administration',
-    icon: Building2,
+    title: 'COMMUNICATIONS',
+    icon: MessageSquare,
     items: [
-      { label: 'Clients', icon: UsersRound, path: '/dashboard/clients' },
-      { label: 'Client Admins', icon: User, path: '/dashboard/client-admins' },
-      { label: 'Requests', icon: FileCheck, path: '/dashboard/tenant-requests' },
-      { label: 'Subscriptions', icon: Crown, path: '/dashboard/tenant-subscriptions' },
-      { label: 'Billing & Payments', icon: BillingIcon, path: '/dashboard/billing' },
-      { label: 'Services', icon: Wrench, path: '/dashboard/services' },
-      { label: 'Pricing', icon: DollarSign, path: '/dashboard/pricing' },
-      { label: 'Usage Analytics', icon: BarChart, path: '/dashboard/usage-analytics' },
+      { label: 'Notice Board', icon: Bell, path: '/dashboard/notice-board' },
+      { label: 'Announcements', icon: Megaphone, path: '/dashboard/announcements' },
+      { label: 'Messages', icon: Mail, path: '/dashboard/messages' },
+      { label: 'Notifications', icon: Bell, path: '/dashboard/notifications' },
     ]
   },
   {
-    title: 'Super Administration',
+    title: 'KNOWLEDGE CENTRE',
+    icon: BookOpen,
+    items: [
+      { label: 'Trainings', icon: GraduationCap, path: '/dashboard/trainings' },
+      { label: 'Library', icon: Library, path: '/dashboard/library' },
+      { label: 'AI Bot / FAQ', icon: Bot, path: '/dashboard/ai-bot' },
+      { label: 'Learning Paths', icon: Map, path: '/dashboard/learning-paths' },
+    ]
+  },
+  {
+    title: 'ADMINISTRATION',
+    icon: Settings,
+    items: [
+      { label: 'Team & Access', icon: Users, path: '/dashboard/team-access' },
+      { label: 'Requests', icon: FileCheck, path: '/dashboard/requests' },
+      { label: 'Subscriptions', icon: Crown, path: '/dashboard/subscriptions' },
+      { label: 'Billing & Payments', icon: CreditCard, path: '/dashboard/billing-payments' },
+      { label: 'Pricing', icon: DollarSign, path: '/dashboard/pricing' },
+      { label: 'Usage Analytics', icon: BarChart, path: '/dashboard/usage-analytics' },
+      { label: 'Audit Logs', icon: FileText, path: '/dashboard/audit-logs' },
+      { label: 'Security Settings', icon: Lock, path: '/dashboard/security-settings' },
+    ]
+  },
+  {
+    title: 'SUPER ADMINISTRATION',
     icon: Shield,
     items: [
       { label: 'Tenants', icon: Building2, path: '/dashboard/tenants' },
       { label: 'Tenant Admins', icon: User, path: '/dashboard/tenant-admins' },
       { label: 'Platform Settings', icon: Settings, path: '/dashboard/platform-settings' },
       { label: 'System Health', icon: Activity, path: '/dashboard/system-health' },
-      { label: 'Global Audit', icon: FileCheck, path: '/dashboard/global-audit' },
+      { label: 'System Logs', icon: Server, path: '/dashboard/system-logs' },
+      { label: 'Global Usage Dashboard', icon: Globe, path: '/dashboard/global-usage' },
     ]
   },
-  {
-    title: 'Audit & Compliance',
-    icon: Shield,
-    items: [
-      { label: 'Audit Trail', icon: FileText, path: '/dashboard/audit-trail' },
-      { label: 'Compliance Reports', icon: FileCheck, path: '/dashboard/compliance-reports' },
-      { label: 'Regulatory Docs', icon: FileText, path: '/dashboard/regulatory-docs' },
-      { label: 'Policy Management', icon: Book, path: '/dashboard/policies' },
-      { label: 'Certification Tracking', icon: Award, path: '/dashboard/certifications' },
-      { label: 'Audit Schedule', icon: Calendar, path: '/dashboard/audit-schedule' },
-    ]
-  }
+  
 ];
 
   const renderMenuItem = (item) => {
@@ -384,11 +368,122 @@ const menuSections = [
     );
   };
 
+  const renderSubmenuItems = (items, level = 1) => {
+    return (
+      <div className={cn("space-y-1", level === 1 ? "pl-4" : "pl-6")}>
+        {items.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.path;
+          
+          return (
+            <Link href={item.path} key={item.path} className="block w-full">
+              <div className={cn(
+                "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+                isActive 
+                  ? "bg-red-600 text-white shadow-md"
+                  : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+              )}>
+                <Icon size={level === 1 ? 16 : 14} className={cn(
+                  "transition-transform duration-200 flex-shrink-0",
+                  isActive 
+                    ? "text-white"
+                    : "text-red-600",
+                  !isActive && "group-hover:rotate-3 group-hover:scale-110"
+                )} />
+                <span className={cn(
+                  "flex-1 text-sm truncate transition-all duration-200",
+                  !isActive && "group-hover:translate-x-0.5"
+                )}>
+                  {item.label}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  };
+
   const renderSection = (section) => {
     const SectionIcon = section.icon;
     const isExpanded = expandedSections[section.title];
     const isHovered = hoveredSection === section.title;
-    const hasActiveChild = section.items.some(item => pathname === item.path);
+    const hasActiveChild = section.items.some(item => {
+      if (item.submenu) {
+        return item.submenu.some(subItem => pathname === subItem.path);
+      }
+      return pathname === item.path;
+    });
+
+    // Special handling for STOCK TAKE section with nested submenus
+    if (section.title === 'STOCK TAKE') {
+      return (
+        <div key={section.title} className="mb-2 w-full">
+          {/* Section Header */}
+          <div
+            onClick={() => isOpen && toggleSection(section.title)}
+            onMouseEnter={() => setHoveredSection(section.title)}
+            onMouseLeave={() => setHoveredSection(null)}
+            className={cn(
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer w-[100%]",
+              "text-black hover:bg-[#F5EEE9] hover:shadow-sm",
+              !isOpen && "justify-center px-2",
+              hasActiveChild && !isExpanded && "bg-[#F5EEE9]"
+            )}
+          >
+            <SectionIcon size={18} className={cn(
+              "transition-all duration-200 flex-shrink-0 text-red-600",
+              isHovered && "scale-110",
+              hasActiveChild && !isExpanded && "text-red-600"
+            )} />
+            {isOpen && (
+              <>
+                <span className={cn(
+                  "flex-1 text-sm font-semibold tracking-wide transition-all duration-200 truncate",
+                  hasActiveChild && !isExpanded && "text-red-600"
+                )}>
+                  {section.title}
+                </span>
+                <div className={cn(
+                  "transition-all duration-300 ease-in-out flex-shrink-0 ml-1",
+                  isExpanded ? "rotate-180" : "rotate-0"
+                )}>
+                  {isExpanded ? (
+                    <ChevronDown size={14} className="text-black" />
+                  ) : (
+                    <ChevronRightIcon size={14} className="text-black" />
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Stock Take Items with nested submenus */}
+          {isOpen && (
+            <div className={cn(
+              "overflow-hidden transition-all duration-300 ease-in-out w-[100%]",
+              isExpanded ? "max-h-[800px] opacity-100 mt-1" : "max-h-0 opacity-0"
+            )}>
+              <div className="pl-2 space-y-2 w-full">
+                {section.items.map((item, idx) => {
+                  if (item.submenu) {
+                    return (
+                      <StockTakeSubmenu 
+                        key={idx}
+                        item={item}
+                        pathname={pathname}
+                        isOpen={isOpen}
+                      />
+                    );
+                  }
+                  return renderMenuItem(item);
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div key={section.title} className="mb-2 w-full">
@@ -526,12 +621,84 @@ const menuSections = [
     );
   };
 
+  // Component for Stock Take submenu items with nested structure
+  const StockTakeSubmenu = ({ item, pathname, isOpen }) => {
+    const [isSubmenuExpanded, setIsSubmenuExpanded] = useState(false);
+    const Icon = item.icon;
+    const hasActiveChild = item.submenu.some(subItem => pathname === subItem.path);
+    
+    useEffect(() => {
+      if (hasActiveChild) {
+        setIsSubmenuExpanded(true);
+      }
+    }, [hasActiveChild]);
+    
+    return (
+      <div className="w-full">
+        <div
+          onClick={() => setIsSubmenuExpanded(!isSubmenuExpanded)}
+          className={cn(
+            "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+            "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+          )}
+        >
+          <Icon size={18} className={cn(
+            "transition-transform duration-200 flex-shrink-0 text-red-600",
+            "group-hover:rotate-3 group-hover:scale-110"
+          )} />
+          <span className="flex-1 text-sm truncate transition-all duration-200 group-hover:translate-x-0.5">
+            {item.label}
+          </span>
+          <div className={cn(
+            "transition-all duration-300 ease-in-out",
+            isSubmenuExpanded ? "rotate-180" : "rotate-0"
+          )}>
+            <ChevronDown size={14} className="text-black" />
+          </div>
+        </div>
+        
+        {isSubmenuExpanded && (
+          <div className="mt-1 space-y-1 pl-4">
+            {item.submenu.map(subItem => {
+              const SubIcon = subItem.icon;
+              const isActive = pathname === subItem.path;
+              return (
+                <Link href={subItem.path} key={subItem.path} className="block w-full">
+                  <div className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+                    isActive 
+                      ? "bg-red-600 text-white shadow-md"
+                      : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+                  )}>
+                    <SubIcon size={16} className={cn(
+                      "transition-transform duration-200 flex-shrink-0",
+                      isActive 
+                        ? "text-white"
+                        : "text-red-600",
+                      !isActive && "group-hover:rotate-3 group-hover:scale-110"
+                    )} />
+                    <span className={cn(
+                      "flex-1 text-sm truncate transition-all duration-200",
+                      !isActive && "group-hover:translate-x-0.5"
+                    )}>
+                      {subItem.label}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (!mounted) return null;
 
   return (
     <aside className={cn(
       "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col",
-      isOpen ? "w-65" : "w-14"
+      isOpen ? "w-68" : "w-14"
     )}>
       {/* Header Section with animation */}
       <div className={cn(
