@@ -472,7 +472,7 @@ const StocktakeSchedulerPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white p-6 rounded-md">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">

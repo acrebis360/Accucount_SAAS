@@ -230,7 +230,7 @@ const menuSections = [
         { label: 'Bar Code / QR Generator', icon: QrCode, path: '/dashboard/barcode-generator' },
       ]},
       { label: 'Plan', icon: Calendar, submenu: [
-        { label: 'Event Scheduling', icon: Calendar, path: '/dashboard/stocktake/event-scheduling' },
+        { label: 'Event Scheduling', icon: Calendar, path: '/dashboard/stocktake/scheduler' },
         { label: 'Event Setup', icon: Settings, path: '/dashboard/stocktake/event-setup' },
       ]},
       { label: 'Execute (LIVE)', icon: Play, submenu: [
@@ -243,7 +243,7 @@ const menuSections = [
     icon: BarChart3,
     items: [
       { label: 'Analytics Dashboard', icon: LayoutDashboard, path: '/dashboard/analytics-dashboard' },
-      { label: 'Stock Take History', icon: History, path: '/dashboard/stocktake-history-report' },
+      { label: 'Stock Take History', icon: History, path: '/dashboard/stocktake-history' },
       { label: 'Custom Reports', icon: FileText, path: '/dashboard/custom-reports' },
     ]
   },
@@ -315,7 +315,7 @@ const menuSections = [
       { label: 'System Logs', icon: Server, path: '/dashboard/system-logs' },
       { label: 'Global Usage Dashboard', icon: Globe, path: '/dashboard/global-usage' },
     ]
-  },
+  }
   
 ];
 
