@@ -234,7 +234,7 @@ const menuSections = [
         { label: 'Event Setup', icon: Settings, path: '/dashboard/stocktake/event-setup' },
       ]},
       { label: 'Execute (LIVE)', icon: Play, submenu: [
-        { label: 'Live & Upcoming Events', icon: LayoutDashboard, path: '/dashboard/live-dashboard' },
+        { label: 'Live & Upcoming Events', icon: LayoutDashboard, path: '/dashboard/live/live-dashboard' },
       ]},
     ]
   },
