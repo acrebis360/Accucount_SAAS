@@ -1,6 +1,6 @@
-// contexts/SidebarContext.js
 'use client';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 const SidebarContext = createContext();
 
@@ -13,8 +13,22 @@ export const useSidebar = () => {
 };
 
 export const SidebarProvider = ({ children }) => {
+  const pathname = usePathname();
+
   const [isSecondarySidebarOpen, setIsSecondarySidebarOpen] = useState(false);
   const [selectedEventData, setSelectedEventData] = useState(null);
+
+  // ✅ 1. Auto-open sidebar based on URL
+useEffect(() => {
+  if (pathname.startsWith('/dashboard/live')) {
+    setIsSecondarySidebarOpen(true);
+  } else {
+    setIsSecondarySidebarOpen(false);
+    setSelectedEventData(null);
+  }
+}, [pathname]);
+
+
 
   const openSecondarySidebar = (eventData) => {
     console.log("Opening sidebar with data:", eventData);
@@ -24,6 +38,10 @@ export const SidebarProvider = ({ children }) => {
 
   const closeSecondarySidebar = () => {
     console.log("Closing sidebar");
+
+    // ❗ Prevent closing if user is on /dashboard/live
+    if (pathname.startsWith('/dashboard/live')) return;
+
     setIsSecondarySidebarOpen(false);
     setSelectedEventData(null);
   };

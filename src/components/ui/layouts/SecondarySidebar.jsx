@@ -36,6 +36,7 @@ const SecondarySidebar = ({ isOpen, onClose, onCollapse, eventData }) => {
     setMounted(true);
   }, []);
 
+
   // Auto-expand if any child is active and set default active for Event Dashboard
   useEffect(() => {
     const newExpanded = { ...expandedMenus };
@@ -128,7 +129,7 @@ const SecondarySidebar = ({ isOpen, onClose, onCollapse, eventData }) => {
 
   const renderMenuItem = (item) => {
     const Icon = item.icon;
-    const isActive = pathname === item.path;
+    const isActive = pathname.startsWith(item.path);
     
     return (
       <TooltipProvider key={item.path} delayDuration={300}>
@@ -179,7 +180,9 @@ const SecondarySidebar = ({ isOpen, onClose, onCollapse, eventData }) => {
     const Icon = menu.icon;
     
     // Check if any child is active
-    const hasActiveChild = menu.items.some(item => pathname === item.path);
+  const hasActiveChild = menu.items.some(item =>
+  pathname.startsWith(item.path)
+);
     
     return (
       <div key={menuKey} className="mb-2 w-full">
