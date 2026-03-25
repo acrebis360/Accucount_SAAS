@@ -1,10 +1,10 @@
-import ReportBuilderPage from '@/webPages/home/ReportBuilder'
+import CustomReportsPage from '@/webPages/InsightReporting/CustomReports'
 import React from 'react'
 
 function page() {
   return (
     <div>
-        <ReportBuilderPage/>
+      <CustomReportsPage/>
     </div>
   )
 }
