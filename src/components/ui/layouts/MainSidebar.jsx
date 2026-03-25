@@ -606,76 +606,84 @@ const menuSections = [
   };
 
   // Component for Stock Take submenu items with nested structure
-  const StockTakeSubmenu = ({ item, pathname, isOpen }) => {
-    const [isSubmenuExpanded, setIsSubmenuExpanded] = useState(false);
-    const Icon = item.icon;
-    const hasActiveChild = item.submenu.some(subItem => pathname === subItem.path);
-    
-    useEffect(() => {
-      if (hasActiveChild) {
-        setIsSubmenuExpanded(true);
-      }
-    }, [hasActiveChild]);
-    
-    return (
-      <div className="w-full">
-        <div
-          onClick={() => setIsSubmenuExpanded(!isSubmenuExpanded)}
-          className={cn(
-            "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
-            "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
-          )}
-        >
-          <Icon size={18} className={cn(
-            "transition-transform duration-200 flex-shrink-0 text-red-600",
-            "group-hover:rotate-3 group-hover:scale-110"
-          )} />
-          <span className="flex-1 text-sm truncate transition-all duration-200 group-hover:translate-x-0.5">
-            {item.label}
-          </span>
-          <div className={cn(
-            "transition-all duration-300 ease-in-out",
-            isSubmenuExpanded ? "rotate-180" : "rotate-0"
-          )}>
-            <ChevronDown size={14} className="text-black" />
-          </div>
-        </div>
-        
-        {isSubmenuExpanded && (
-          <div className="mt-1 space-y-1 pl-4">
-            {item.submenu.map(subItem => {
-              const SubIcon = subItem.icon;
-              const isActive = pathname === subItem.path;
-              return (
-                <Link href={subItem.path} key={subItem.path} className="block w-full">
-                  <div className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
-                    isActive 
-                      ? "bg-red-600 text-white shadow-md"
-                      : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
-                  )}>
-                    <SubIcon size={16} className={cn(
-                      "transition-transform duration-200 flex-shrink-0",
-                      isActive 
-                        ? "text-white"
-                        : "text-red-600",
-                      !isActive && "group-hover:rotate-3 group-hover:scale-110"
-                    )} />
-                    <span className={cn(
-                      "flex-1 text-sm truncate transition-all duration-200",
-                      !isActive && "group-hover:translate-x-0.5"
-                    )}>
-                      {subItem.label}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+const StockTakeSubmenu = ({ item, pathname, isOpen }) => {
+  const [isSubmenuExpanded, setIsSubmenuExpanded] = useState(false);
+  const Icon = item.icon;
+  
+  // Check if current path starts with the prefix for this submenu
+  const hasActiveChild = item.submenu.some(subItem => pathname === subItem.path);
+  
+  // Special check for Execute (LIVE) submenu - check if path starts with /dashboard/live
+  const isLiveSubmenu = item.label === 'Execute (LIVE)';
+  const hasLivePathPrefix = isLiveSubmenu && pathname.startsWith('/dashboard/live');
+  
+  const shouldBeExpanded = hasActiveChild || hasLivePathPrefix;
+  
+  useEffect(() => {
+    if (shouldBeExpanded) {
+      setIsSubmenuExpanded(true);
+    }
+  }, [shouldBeExpanded]);
+  
+  return (
+    <div className="w-full">
+      <div
+        onClick={() => setIsSubmenuExpanded(!isSubmenuExpanded)}
+        className={cn(
+          "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+          "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
         )}
+      >
+        <Icon size={18} className={cn(
+          "transition-transform duration-200 flex-shrink-0 text-red-600",
+          "group-hover:rotate-3 group-hover:scale-110"
+        )} />
+        <span className="flex-1 text-sm truncate transition-all duration-200 group-hover:translate-x-0.5">
+          {item.label}
+        </span>
+        <div className={cn(
+          "transition-all duration-300 ease-in-out",
+          isSubmenuExpanded ? "rotate-180" : "rotate-0"
+        )}>
+          <ChevronDown size={14} className="text-black" />
+        </div>
       </div>
-    );
-  };
+      
+      {isSubmenuExpanded && (
+        <div className="mt-1 space-y-1 pl-4">
+          {item.submenu.map(subItem => {
+            const SubIcon = subItem.icon;
+            const isActive = pathname === subItem.path || (isLiveSubmenu && pathname.startsWith('/dashboard/live'));
+            return (
+              <Link href={subItem.path} key={subItem.path} className="block w-full">
+                <div className={cn(
+                  "flex items-center gap-2.5 rounded-lg px-3 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-full",
+                  isActive 
+                    ? "bg-red-600 text-white shadow-md"
+                    : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md",
+                )}>
+                  <SubIcon size={16} className={cn(
+                    "transition-transform duration-200 flex-shrink-0",
+                    isActive 
+                      ? "text-white"
+                      : "text-red-600",
+                    !isActive && "group-hover:rotate-3 group-hover:scale-110"
+                  )} />
+                  <span className={cn(
+                    "flex-1 text-sm truncate transition-all duration-200",
+                    !isActive && "group-hover:translate-x-0.5"
+                  )}>
+                    {subItem.label}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
   if (!mounted) return null;
 
