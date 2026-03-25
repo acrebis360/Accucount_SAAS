@@ -235,22 +235,6 @@ const menuSections = [
       ]},
       { label: 'Execute (LIVE)', icon: Play, submenu: [
         { label: 'Live & Upcoming Events', icon: LayoutDashboard, path: '/dashboard/live-dashboard' },
-        { label: 'Event Dashboard', icon: CalendarDays, path: '/dashboard/event-dashboard' },
-        { label: 'Count', icon: Calculator, path: '/dashboard/count' },
-        { label: 'Fix', icon: WrenchIcon, path: '/dashboard/audit-fix' },
-        { label: 'Validation', icon: CheckCircle, path: '/dashboard/validation' },
-        { label: 'Close Out', icon: CheckCircle2, path: '/dashboard/closeout' },
-      ]},
-      { label: 'Review & Control', icon: Eye, submenu: [
-        { label: 'Team Productivity', icon: Users, path: '/dashboard/team-productivity' },
-        { label: 'Discrepancy Dashboard', icon: AlertTriangle, path: '/dashboard/discrepancy-dashboard' },
-        { label: 'Event Reports', icon: FileText, path: '/dashboard/event-reports' },
-      ]},
-      { label: 'Reconciliation', icon: GitBranch, submenu: [
-        { label: 'Reconciliation Workspace', icon: LayoutDashboard, path: '/dashboard/reconciliation-workspace' },
-        { label: 'Adjustment Preview', icon: Eye, path: '/dashboard/adjustment-preview' },
-        { label: 'Approval Workflow', icon: CheckSquare, path: '/dashboard/approval-workflow' },
-        { label: 'Inventory Adjustment Posting', icon: RefreshCw, path: '/dashboard/adjustment-posting' },
       ]},
     ]
   },
@@ -707,8 +691,8 @@ const menuSections = [
       )}>
         {isOpen && (
           <span className="text-3xl font-semibold tracking-tight animate-in fade-in slide-in-from-left-2 duration-300 truncate">
-            <span className="text-red-600 tracking-wider">ACCU</span>
-            <span className="text-white tracking-wider">COUNT</span>
+            <span className="text-red-600 tracking-wider">ACREBIS</span>
+            {/* <span className="text-white tracking-wider">BIS</span> */}
           </span>
         )}
         <Button

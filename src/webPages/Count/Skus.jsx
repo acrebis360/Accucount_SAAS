@@ -253,7 +253,7 @@ const TagSKUsPage = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentTagId = tagId || searchParams.get("id");
+  const currentTagId = tagId || searchParams.get("tagid");
   const { toast, success, error: toastError, info } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -426,7 +426,7 @@ const TagSKUsPage = ({
   };
 
   const handleSKUClick = (skuId) => {
-    router.push(`/accucount/count/skus/${skuId}`);
+    router.push(`/dashboard/live/count/${eventId}/skus/${skuId}`);
   };
 
   const handleDeleteSKU = async (skuId, e) => {

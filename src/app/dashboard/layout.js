@@ -1,12 +1,17 @@
 // components/layouts/AdminLayout.js
 'use client'
 import { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import MainSidebar from '@/components/ui/layouts/MainSidebar';
+import SecondarySidebar from '@/components/ui/layouts/SecondarySidebar';
 import Header from '@/components/ui/layouts/Header';
+import { useSidebar } from '@/context/SidebarContext';
+
 
 const AdminLayout = ({ children }) => {
   const [isMainSidebarOpen, setIsMainSidebarOpen] = useState(true);
+  const { isSecondarySidebarOpen, selectedEventData, closeSecondarySidebar } = useSidebar();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,6 +21,14 @@ const AdminLayout = ({ children }) => {
           isOpen={isMainSidebarOpen} 
           onToggle={() => setIsMainSidebarOpen(!isMainSidebarOpen)}
         />
+           {/* Secondary Sidebar - Adjacent to main content */}
+        {isSecondarySidebarOpen && (
+          <SecondarySidebar 
+            isOpen={isSecondarySidebarOpen}
+            onClose={closeSecondarySidebar}
+            eventData={selectedEventData}
+          />
+        )}
 
         {/* Main Content Area */}
         <div className={cn(
@@ -31,6 +44,8 @@ const AdminLayout = ({ children }) => {
             {children}
           </main>
         </div>
+
+     
       </div>
     </div>
   );

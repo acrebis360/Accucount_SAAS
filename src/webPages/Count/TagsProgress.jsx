@@ -755,10 +755,9 @@ const TagsPage = ({ eventId, zoneId, eventName, zoneName, onRefreshTags }) => {
     }
 
     const identifier = tag?.id;
-    console.log("Navigating to SKU details with identifier:", identifier);
 
     if (identifier) {
-      router.push(`/dashboard/count/skus?id=${identifier}`);
+      router.push(`/dashboard/count/2/skus/${identifier}`);
     }
   };
 

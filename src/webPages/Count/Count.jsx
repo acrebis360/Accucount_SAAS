@@ -221,7 +221,6 @@ const Count = ({ eventId, eventName, eventAddress, onRefreshProgress }) => {
   }, []);
 
   const handleSaveZone = (zoneData) => {
-    console.log("Save store:", zoneData);
     setIsDialogOpen(false);
   };
 
@@ -299,7 +298,9 @@ const Count = ({ eventId, eventName, eventAddress, onRefreshProgress }) => {
   };
 
   const handleRowClick = (zoneId) => {
-    router.push(`/dashboard/count/tags?zone=${zoneId}`);
+    console.log(eventId, zoneId);
+
+    router.push(`/dashboard/live/count/${eventId}/tags?zone=${zoneId}`);
   };
 
   const handleEditClick = (zoneId, e) => {

@@ -1,570 +1,307 @@
-// components/ui/layouts/SecondarySidebar.jsx
+// components/ui/layouts/SecondarySidebar.js
 'use client';
-
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  Folder,
-  FolderOpen,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Plus,
-  MoreHorizontal,
-  Trash2,
-  Edit,
-  Copy,
-  Archive,
-  Search,
-  FolderTree,
-  Image as ImageIcon
-} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useFolders } from '@/context/FolderContext';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronRight, X, ChevronLeft, Package, LayoutDashboard, Settings, Users, FileText, Calendar, CheckCircle, Eye, GitBranch, Play } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-const SecondarySidebar = ({ isOpen, onToggle, activeMenu }) => {
-  const router = useRouter();
-  const { folders, setFolders, selectedFolder, setSelectedFolder } = useFolders();
+import { 
+  Calculator,
+  WrenchIcon,
+  CheckCircle2,
+  AlertTriangle,
+  CheckSquare,
+  RefreshCw
+} from 'lucide-react';
+import { useSidebar } from '@/context/SidebarContext';
 
-  const [expandedFolders, setExpandedFolders] = useState(new Set());
-  const [showNewFolderDialog, setShowNewFolderDialog] = useState(false);
-  const [showFolderImageDialog, setShowFolderImageDialog] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
-  const [folderImage, setFolderImage] = useState(null);
-  const [folderImagePreview, setFolderImagePreview] = useState(null);
-  const [contextMenuFolder, setContextMenuFolder] = useState(null);
-  const [selectedFolderForImage, setSelectedFolderForImage] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+const SecondarySidebar = ({ isOpen, onClose, eventData }) => {
+  const pathname = usePathname();
+  const { closeSecondarySidebar } = useSidebar();
+  const [expandedMenus, setExpandedMenus] = useState({
+    execute: true,
+    review: true,
+    reconciliation: true
+  });
+  const [hoveredSection, setHoveredSection] = useState(null);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Only show content for Items menu for now
-  if (activeMenu !== 'Items') {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Auto-expand if any child is active and set default active for Event Dashboard
+  useEffect(() => {
+    const newExpanded = { ...expandedMenus };
+    const executePaths = [
+      '/dashboard/event-dashboard',
+      '/dashboard/count',
+      '/dashboard/audit-fix',
+      '/dashboard/validation',
+      '/dashboard/closeout'
+    ];
+    const reviewPaths = [
+      '/dashboard/team-productivity',
+      '/dashboard/discrepancy-dashboard',
+      '/dashboard/event-reports'
+    ];
+    const reconciliationPaths = [
+      '/dashboard/reconciliation-workspace',
+      '/dashboard/adjustment-preview',
+      '/dashboard/approval-workflow',
+      '/dashboard/adjustment-posting'
+    ];
+
+    if (executePaths.includes(pathname)) newExpanded.execute = true;
+    if (reviewPaths.includes(pathname)) newExpanded.review = true;
+    if (reconciliationPaths.includes(pathname)) newExpanded.reconciliation = true;
+
+    setExpandedMenus(newExpanded);
+  }, [pathname]);
+
+  const toggleMenu = (menu) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [menu]: !prev[menu]
+    }));
+  };
+
+  const handleLinkClick = () => {
+    // Keep sidebar open on navigation
+  };
+
+  const menuItems = {
+    execute: {
+      title: 'Execute (LIVE)',
+      icon: Play,
+      iconColor: "text-red-600",
+      items: [
+        { label: 'Event Dashboard', icon: LayoutDashboard, path: '/dashboard/live/event-dashboard/2' },
+        { label: 'Count', icon: Calculator, path: '/dashboard/live/count/2' },
+        { label: 'Fix', icon: WrenchIcon, path: '/dashboard/live/audit-fix' },
+        { label: 'Validation', icon: CheckCircle, path: '/dashboard/live/validation' },
+        { label: 'Close Out', icon: CheckCircle2, path: '/dashboard/live/closeout' },
+      ]
+    },
+    review: {
+      title: 'Review & Control',
+      icon: Eye,
+      iconColor: "text-blue-600",
+      items: [
+        { label: 'Team Productivity', icon: Users, path: '/dashboard/team-productivity' },
+        { label: 'Discrepancy Dashboard', icon: AlertTriangle, path: '/dashboard/discrepancy-dashboard' },
+        { label: 'Event Reports', icon: FileText, path: '/dashboard/event-reports' },
+      ]
+    },
+    reconciliation: {
+      title: 'Reconciliation',
+      icon: GitBranch,
+      iconColor: "text-purple-600",
+      items: [
+        { label: 'Reconciliation Workspace', icon: LayoutDashboard, path: '/dashboard/reconciliation-workspace' },
+        { label: 'Adjustment Preview', icon: Eye, path: '/dashboard/adjustment-preview' },
+        { label: 'Approval Workflow', icon: CheckSquare, path: '/dashboard/approval-workflow' },
+        { label: 'Inventory Adjustment Posting', icon: RefreshCw, path: '/dashboard/adjustment-posting' },
+      ]
+    }
+  };
+
+  const renderMenuItem = (item) => {
+    const Icon = item.icon;
+    const isActive = pathname === item.path;
+    
     return (
-      <aside className={cn(
-        "relative h-screen bg-white/80 backdrop-blur-sm border-r border-gray-200/50 transition-all duration-300",
-        isOpen ? "w-80" : "w-20"
-      )}>
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200/50">
-          <span className="font-medium text-sm capitalize text-gray-600">
-            {activeMenu}
-          </span>
-          <Button variant="ghost" size="icon" onClick={onToggle} className="hover:bg-gray-100/50">
-            {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-          </Button>
-        </div>
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)] text-gray-400 text-sm px-4 text-center">
-          <div className="space-y-2">
-            <FolderTree size={32} className="mx-auto opacity-50" />
-            <p>Coming soon...</p>
-          </div>
-        </div>
-      </aside>
-    );
-  }
-
-  const toggleFolder = (folderId, e) => {
-    e.stopPropagation();
-    setExpandedFolders(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(folderId)) {
-        newSet.delete(folderId);
-      } else {
-        newSet.add(folderId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleFolderClick = (folder) => {
-    setSelectedFolder(folder);
-    const event = new CustomEvent('folderSelect', { detail: folder });
-    window.dispatchEvent(event);
-    router.push('/dashboard/items');
-  };
-
-  const handleFolderImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFolderImage(reader.result);
-        setFolderImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const addFolder = (parentId = null) => {
-    if (!newFolderName.trim()) return;
-
-    const newFolder = {
-      id: Date.now().toString(),
-      name: newFolderName,
-      type: 'folder',
-      parentId,
-      image: folderImage || null,
-      children: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    if (parentId === null) {
-      setFolders(prev => [...prev, newFolder]);
-    } else {
-      const updateFolders = (items) => items.map(item => {
-        if (item.id === parentId) {
-          return {
-            ...item,
-            children: [...(item.children || []), newFolder]
-          };
-        }
-        if (item.children) {
-          return {
-            ...item,
-            children: updateFolders(item.children)
-          };
-        }
-        return item;
-      });
-      setFolders(updateFolders(folders));
-      setExpandedFolders(prev => new Set([...prev, parentId]));
-    }
-
-    setNewFolderName('');
-    setFolderImage(null);
-    setFolderImagePreview(null);
-    setShowNewFolderDialog(false);
-    setContextMenuFolder(null);
-  };
-
-  const updateFolderImage = () => {
-    if (!selectedFolderForImage || !folderImage) return;
-
-    const update = (items) => items.map(item => {
-      if (item.id === selectedFolderForImage.id) {
-        return { ...item, image: folderImage };
-      }
-      if (item.children) {
-        return { ...item, children: update(item.children) };
-      }
-      return item;
-    });
-
-    setFolders(update(folders));
-
-    setShowFolderImageDialog(false);
-    setSelectedFolderForImage(null);
-    setFolderImage(null);
-    setFolderImagePreview(null);
-  };
-
-  const deleteFolder = (folderId, e) => {
-    e.stopPropagation();
-    if (confirm('Are you sure you want to delete this folder and all its contents?')) {
-      const removeFolder = (items) => {
-        return items.filter(item => {
-          if (item.id === folderId) return false;
-          if (item.children) {
-            item.children = removeFolder(item.children);
-          }
-          return true;
-        });
-      };
-      setFolders(removeFolder(folders));
-
-      if (selectedFolder?.id === folderId) {
-        setSelectedFolder(null);
-      }
-    }
-  };
-
-  const renameFolder = (folderId, currentName, e) => {
-    e.stopPropagation();
-    const newName = prompt('Enter new folder name:', currentName);
-    if (newName && newName.trim()) {
-      const updateName = (items) => items.map(item => {
-        if (item.id === folderId) {
-          return { ...item, name: newName };
-        }
-        if (item.children) {
-          return { ...item, children: updateName(item.children) };
-        }
-        return item;
-      });
-      setFolders(updateName(folders));
-    }
-  };
-
-  const filterFolders = (items, query) => {
-    if (!query) return items;
-
-    return items.reduce((acc, item) => {
-      if (item.name.toLowerCase().includes(query.toLowerCase())) {
-        acc.push(item);
-      } else if (item.children) {
-        const filteredChildren = filterFolders(item.children, query);
-        if (filteredChildren.length > 0) {
-          acc.push({ ...item, children: filteredChildren });
-        }
-      }
-      return acc;
-    }, []);
-  };
-
-  const renderFolderTree = (items, level = 0) => {
-    return items.map(item => (
-      <div key={item.id}>
-        <div
-          className={cn(
-            "flex items-center gap-1 px-2 py-2 rounded-lg cursor-pointer group transition-all duration-200",
-            selectedFolder?.id === item.id
-              ? "bg-emerald-50 text-emerald-700 shadow-sm"
-              : "hover:bg-gray-100/80 hover:shadow-sm",
-            level > 0 && "ml-4"
-          )}
-          style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onClick={() => handleFolderClick(item)}
-        >
-          <button
-            onClick={(e) => toggleFolder(item.id, e)}
-            className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+      <TooltipProvider key={item.path} delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={item.path} className="block w-full" onClick={handleLinkClick}>
+              <div className={cn(
+                "flex items-center gap-2.5 rounded-lg px-2 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer group w-[90%]",
+                isActive 
+                  ? "bg-red-600 text-white shadow-md"
+                  : "text-black hover:bg-[#F5EEE9] hover:text-black hover:shadow-md"
+              )}>
+                <Icon size={16} className={cn(
+                  "transition-transform duration-200 flex-shrink-0",
+                  isActive 
+                    ? "text-white"
+                    : "text-red-600",
+                  !isActive && "group-hover:rotate-3 group-hover:scale-110"
+                )} />
+                <span className={cn(
+                  "flex-1 text-sm truncate transition-all duration-200",
+                  !isActive && "group-hover:translate-x-0.5"
+                )}>
+                  {item.label}
+                </span>
+              </div>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent 
+            side="right" 
+            className="animate-in fade-in slide-in-from-left-1 duration-200 truncate text-sm bg-black text-white border-none z-50"
           >
-            {item.children && item.children.length > 0 ? (
-              expandedFolders.has(item.id) ? (
-                <ChevronDown size={16} className="text-gray-500" />
-              ) : (
-                <ChevronRight size={16} className="text-gray-500" />
-              )
-            ) : (
-              <span className="w-4" />
-            )}
-          </button>
+            <span className="font-medium">{item.label}</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
-          <div className="flex items-center flex-1 gap-2">
-            <div className="w-5 h-5 rounded overflow-hidden bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-              {item.image ? (
-                <img src={item.image} alt="" className="w-full h-full object-cover" />
-              ) : (
-                expandedFolders.has(item.id) ? (
-                  <FolderOpen size={14} className="text-amber-500" />
-                ) : (
-                  <Folder size={14} className="text-amber-500" />
-                )
-              )}
+  const renderMenuSection = (menuKey, menu) => {
+    const isExpanded = expandedMenus[menuKey];
+    const isHovered = hoveredSection === menuKey;
+    const Icon = menu.icon;
+    
+    // Check if any child is active
+    const hasActiveChild = menu.items.some(item => pathname === item.path);
+    
+    return (
+      <div key={menuKey} className="mb-2 w-full">
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                onClick={() => toggleMenu(menuKey)}
+                onMouseEnter={() => setHoveredSection(menuKey)}
+                onMouseLeave={() => setHoveredSection(null)}
+                className={cn(
+                  "flex items-center gap-2.5 rounded-lg px-1 py-2 font-medium transition-all duration-200 ease-in-out cursor-pointer w-[90%]",
+                  "text-black hover:bg-[#F5EEE9] hover:shadow-sm",
+                  hasActiveChild && !isExpanded && "bg-[#F5EEE9]"
+                )}
+              >
+                <Icon size={18} className={cn(
+                  "transition-all duration-200 flex-shrink-0",
+                  menu.iconColor || "text-red-600",
+                  isHovered && "scale-110",
+                  hasActiveChild && !isExpanded && "text-red-600"
+                )} />
+                <span className={cn(
+                  "flex-1 text-sm font-semibold tracking-wide transition-all duration-200 truncate",
+                  hasActiveChild && !isExpanded && "text-red-600"
+                )}>
+                  {menu.title}
+                </span>
+                <div className={cn(
+                  "transition-all duration-300 ease-in-out flex-shrink-0 ml-1",
+                  isExpanded ? "rotate-180" : "rotate-0"
+                )}>
+                  {isExpanded ? (
+                    <ChevronDown size={14} className="text-black" />
+                  ) : (
+                    <ChevronRight size={14} className="text-black" />
+                  )}
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent 
+              side="right" 
+              className="animate-in fade-in slide-in-from-left-1 duration-200 text-sm bg-black text-white border-none"
+            >
+              <span className="font-medium">{menu.title}</span>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        {isExpanded && (
+          <div className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out w-full",
+            isExpanded ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
+          )}>
+            <div className="pl-4 pr-2 space-y-1 w-full">
+              {menu.items.map(item => renderMenuItem(item))}
             </div>
-            <span className="text-sm font-medium text-gray-700 flex-1 truncate">{item.name}</span>
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:bg-gray-200">
-                <MoreHorizontal size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem onClick={(e) => {
-                e.stopPropagation();
-                setContextMenuFolder(item);
-                setShowNewFolderDialog(true);
-              }}>
-                <Plus className="mr-2 h-4 w-4" /> New Subfolder
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => {
-                e.stopPropagation();
-                setSelectedFolderForImage(item);
-                setShowFolderImageDialog(true);
-              }}>
-                <ImageIcon className="mr-2 h-4 w-4" /> Change Image
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => renameFolder(item.id, item.name, e)}>
-                <Edit className="mr-2 h-4 w-4" /> Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => deleteFolder(item.id, e)}>
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                <Copy className="mr-2 h-4 w-4" /> Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                <Archive className="mr-2 h-4 w-4" /> Archive
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {expandedFolders.has(item.id) && item.children && item.children.length > 0 && (
-          <div className="relative">
-            <div className="absolute left-6 top-0 bottom-0 w-px bg-gray-200/50" />
-            {renderFolderTree(item.children, level + 1)}
           </div>
         )}
       </div>
-    ));
+    );
   };
 
-  const filteredFolders = searchQuery ? filterFolders(folders, searchQuery) : folders;
-
-  if (!isOpen) {
-    return (
-      <aside className="relative h-screen bg-white/80 backdrop-blur-sm border-r border-gray-200/50 transition-all duration-300 w-20">
-        <div className="flex h-16 items-center justify-center border-b border-gray-200/50">
-          <Button variant="ghost" size="icon" onClick={onToggle} className="hover:bg-gray-100/50">
-            <ChevronRight size={20} className="text-gray-600" />
-          </Button>
-        </div>
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <Folder size={24} className="text-amber-400" />
-        </div>
-      </aside>
-    );
-  }
+  if (!mounted) return null;
+  if (!isOpen) return null;
 
   return (
-    <aside className="relative h-screen bg-white/80 backdrop-blur-sm border-r border-gray-200/50 transition-all duration-300 w-60 flex flex-col">
-      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200/50">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-amber-50 rounded-lg">
-            <FolderTree size={18} className="text-amber-500" />
-          </div>
-          <span className="font-semibold text-gray-700">Folders</span>
+    <aside className={cn(
+      "relative h-screen bg-white text-black transition-all duration-300 ease-in-out flex flex-col border-l border-[#F5EEE9]",
+      "w-60" // Reduced width from w-65 to w-64 (256px)
+    )}>
+      {/* Header Section with animation */}
+      <div className={cn(
+        "flex h-14 items-center flex-shrink-0 border-b border-[#F5EEE9] transition-all duration-300 bg-black",
+        "justify-between px-3" // Reduced padding
+      )}>
+        <div className="flex-1 min-w-0"> {/* Added min-w-0 for text truncation */}
+          <span className="text-xs font-semibold tracking-tight animate-in fade-in slide-in-from-left-2 duration-300 block truncate">
+            <span className="text-red-600">STOCK TAKE</span>
+            <span className="text-white"> ACTIONS</span>
+          </span>
+          {eventData && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="text-white/70 text-xs mt-0.5 truncate cursor-pointer">
+                    {eventData.name} • {eventData.uniqueId}
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent 
+                  side="bottom" 
+                  className="animate-in fade-in slide-in-from-top-1 duration-200 text-sm bg-black text-white border-none"
+                >
+                  <div>
+                    <p className="font-medium">{eventData.name}</p>
+                    <p className="text-xs text-gray-300 mt-1">ID: {eventData.uniqueId}</p>
+                    {eventData.customerName && (
+                      <p className="text-xs text-gray-300">Customer: {eventData.customerName}</p>
+                    )}
+                    {eventData.storeName && (
+                      <p className="text-xs text-gray-300">Store: {eventData.storeName}</p>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-        <Button variant="ghost" size="icon" onClick={onToggle} className="hover:bg-gray-100/50">
-          <ChevronLeft size={20} className="text-gray-600" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className={cn(
+            "text-white hover:bg-white/20 transition-all duration-200 hover:scale-110 hover:rotate-3 h-7 w-7 flex-shrink-0"
+          )}
+        >
+          <X size={16} className="text-white" />
         </Button>
       </div>
 
-      <div className="p-3 border-b border-gray-200/50">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-          <Input
-            placeholder="Search folders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 bg-white/50 border-gray-200/50 focus:bg-white transition-all"
-          />
+      {/* Navigation Area */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <TooltipProvider delayDuration={0}>
+          <ScrollArea className="flex-1 h-full">
+            <div className="py-2 space-y-2">
+              {Object.entries(menuItems).map(([key, menu]) => (
+                <div key={key} className="w-full">
+                  {renderMenuSection(key, menu)}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </TooltipProvider>
+
+        {/* Footer with animation */}
+        <div className="p-3 border-t border-[#F5EEE9] animate-in fade-in slide-in-from-bottom-2 duration-300 flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-black truncate">Event Actions</span>
+            <span className="text-red-600 flex-shrink-0">Ready</span>
+          </div>
         </div>
       </div>
-
-      <ScrollArea className="flex-1">
-        <div className="p-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setContextMenuFolder(null);
-              setShowNewFolderDialog(true);
-            }}
-            className="w-full justify-start gap-2 mb-2 text-gray-600 hover:bg-amber-50 hover:text-amber-600"
-          >
-            <Plus size={16} />
-            New Folder
-          </Button>
-
-          {filteredFolders.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              <div className="p-3 bg-amber-50 rounded-full w-fit mx-auto mb-3">
-                <Folder size={32} className="text-amber-400" />
-              </div>
-              <p className="text-sm font-medium text-gray-500">No folders found</p>
-              <Button
-                variant="link"
-                className="mt-1 text-amber-600"
-                onClick={() => {
-                  setContextMenuFolder(null);
-                  setShowNewFolderDialog(true);
-                }}
-              >
-                Create your first folder
-              </Button>
-            </div>
-          ) : (
-            renderFolderTree(filteredFolders)
-          )}
-        </div>
-      </ScrollArea>
-
-      {/* New Folder Dialog */}
-      <Dialog open={showNewFolderDialog} onOpenChange={setShowNewFolderDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New Folder</DialogTitle>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div>
-              <Label htmlFor="folderName">Folder Name</Label>
-              <Input
-                id="folderName"
-                value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
-                placeholder="Enter folder name"
-                className="mt-2"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    addFolder(contextMenuFolder?.id);
-                  }
-                }}
-              />
-            </div>
-
-            <div>
-              <Label>Folder Image (Optional)</Label>
-              <div className="mt-2 flex items-center gap-4">
-                {folderImagePreview ? (
-                  <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                    <img
-                      src={folderImagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white"
-                      onClick={() => {
-                        setFolderImage(null);
-                        setFolderImagePreview(null);
-                      }}
-                    >
-                      <Trash2 size={12} />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 rounded-lg bg-amber-50 border-2 border-dashed border-amber-200 flex flex-col items-center justify-center text-amber-400">
-                    <ImageIcon size={24} />
-                    <span className="text-xs mt-1">No image</span>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFolderImageUpload}
-                    className="bg-white/50 border-gray-200/50"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Recommended: Square image, max 2MB
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {contextMenuFolder && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                {contextMenuFolder.image ? (
-                  <div className="w-4 h-4 rounded overflow-hidden">
-                    <img src={contextMenuFolder.image} alt="" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <Folder size={12} className="text-amber-500" />
-                )}
-                Creating in: {contextMenuFolder.name}
-              </p>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              setShowNewFolderDialog(false);
-              setNewFolderName('');
-              setFolderImage(null);
-              setFolderImagePreview(null);
-              setContextMenuFolder(null);
-            }}>
-              Cancel
-            </Button>
-            <Button onClick={() => addFolder(contextMenuFolder?.id)} className="bg-amber-500 hover:bg-amber-600">
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Change Folder Image Dialog */}
-      <Dialog open={showFolderImageDialog} onOpenChange={setShowFolderImageDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Change Folder Image</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            {selectedFolderForImage && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-amber-100 flex items-center justify-center">
-                    {selectedFolderForImage.image ? (
-                      <img src={selectedFolderForImage.image} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <Folder size={24} className="text-amber-500" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">{selectedFolderForImage.name}</p>
-                    <p className="text-xs text-gray-500">Current image</p>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Upload New Image</Label>
-                  <div className="mt-2 flex items-center gap-4">
-                    {folderImagePreview ? (
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                        <img
-                          src={folderImagePreview}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-20 h-20 rounded-lg bg-amber-50 border-2 border-dashed border-amber-200 flex items-center justify-center text-amber-400">
-                        <ImageIcon size={24} />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFolderImageUpload}
-                        className="bg-white/50 border-gray-200/50"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              setShowFolderImageDialog(false);
-              setSelectedFolderForImage(null);
-              setFolderImage(null);
-              setFolderImagePreview(null);
-            }}>
-              Cancel
-            </Button>
-            <Button
-              onClick={updateFolderImage}
-              className="bg-amber-500 hover:bg-amber-600"
-              disabled={!folderImage}
-            >
-              Update Image
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </aside>
   );
 };

@@ -1,30 +1,43 @@
-// src/context/SidebarContext.jsx
-import React, { createContext, useContext, useState } from 'react';
+// contexts/SidebarContext.js
+'use client';
+import { createContext, useContext, useState } from 'react';
 
 const SidebarContext = createContext();
 
-export const SidebarProvider = ({ children }) => {  // Added 'export' keyword
-  const [activeMainMenu, setActiveMainMenu] = useState('inventory');
-  const [isSecondaryOpen, setIsSecondaryOpen] = useState(true);
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within SidebarProvider');
+  }
+  return context;
+};
+
+export const SidebarProvider = ({ children }) => {
+  const [isSecondarySidebarOpen, setIsSecondarySidebarOpen] = useState(false);
+  const [selectedEventData, setSelectedEventData] = useState(null);
+
+  const openSecondarySidebar = (eventData) => {
+    console.log("Opening sidebar with data:", eventData);
+    setSelectedEventData(eventData);
+    setIsSecondarySidebarOpen(true);
+  };
+
+  const closeSecondarySidebar = () => {
+    console.log("Closing sidebar");
+    setIsSecondarySidebarOpen(false);
+    setSelectedEventData(null);
+  };
 
   return (
     <SidebarContext.Provider
       value={{
-        activeMainMenu,
-        setActiveMainMenu,
-        isSecondaryOpen,
-        setIsSecondaryOpen,
+        isSecondarySidebarOpen,
+        selectedEventData,
+        openSecondarySidebar,
+        closeSecondarySidebar,
       }}
     >
       {children}
     </SidebarContext.Provider>
   );
-};
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
 };
