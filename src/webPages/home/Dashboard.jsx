@@ -15,33 +15,28 @@ import {
   Users,
   Boxes,
   Activity,
-  BarChart3,
-  PieChart,
-  LineChart,
   Download,
   RefreshCw,
-  Filter,
   MoreVertical,
-  Eye,
-  ArrowUpRight,
-  ArrowDownRight,
-  Zap,
-  Truck,
-  Warehouse,
-  Scan,
-  Bell,
-  Settings,
   ChevronRight,
   CalendarDays,
   Timer,
   Target,
-  Percent,
   Award,
-  FileText,
-  MapPin,
-  Layers,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
+  Scan,
+  Truck,
+  Warehouse,
+  Search,
+  ChevronDown,
+  Building,
+  Store,
+  Hash,
+  PlayCircle,
+  CalendarClock,
+  History,
+  CheckSquare,
+  ClipboardCheck,
+  AlertCircle as AlertCircleIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -60,131 +55,41 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  AreaChart, 
-  Area, 
-  BarChart, 
-  Bar, 
-  LineChart as ReLineChart, 
-  Line, 
-  PieChart as RePieChart, 
-  Pie, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as ReTooltip, 
-  Legend, 
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  LineChart as ReLineChart,
+  Line,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ReTooltip,
+  Legend,
   ResponsiveContainer,
-  RadialBarChart,
-  RadialBar,
   ComposedChart,
-  Scatter,
-  Treemap
 } from 'recharts';
+import { useRouter } from 'next/navigation';
 
-const DashboardPage = () => {
-  const [dateRange, setDateRange] = useState('week');
-  const [selectedWarehouse, setSelectedWarehouse] = useState('all');
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // Mock data for charts
-  const inventoryTrendData = [
-    { date: 'Dec 15', count: 12450, value: 245000, accuracy: 98.5 },
-    { date: 'Dec 16', count: 12480, value: 247500, accuracy: 98.7 },
-    { date: 'Dec 17', count: 12520, value: 249000, accuracy: 99.0 },
-    { date: 'Dec 18', count: 12560, value: 251000, accuracy: 99.2 },
-    { date: 'Dec 19', count: 12580, value: 252500, accuracy: 99.4 },
-    { date: 'Dec 20', count: 12600, value: 254000, accuracy: 99.5 },
-    { date: 'Dec 21', count: 12650, value: 256000, accuracy: 99.6 },
-  ];
-
-  const stocktakePerformanceData = [
-    { name: 'Jan', completed: 12, accuracy: 98.2, discrepancies: 45 },
-    { name: 'Feb', completed: 15, accuracy: 98.5, discrepancies: 52 },
-    { name: 'Mar', completed: 18, accuracy: 98.8, discrepancies: 48 },
-    { name: 'Apr', completed: 20, accuracy: 99.0, discrepancies: 55 },
-    { name: 'May', completed: 22, accuracy: 99.1, discrepancies: 42 },
-    { name: 'Jun', completed: 25, accuracy: 99.3, discrepancies: 38 },
-    { name: 'Jul', completed: 28, accuracy: 99.4, discrepancies: 35 },
-    { name: 'Aug', completed: 30, accuracy: 99.5, discrepancies: 32 },
-    { name: 'Sep', completed: 32, accuracy: 99.6, discrepancies: 28 },
-    { name: 'Oct', completed: 35, accuracy: 99.7, discrepancies: 25 },
-    { name: 'Nov', completed: 38, accuracy: 99.8, discrepancies: 22 },
-    { name: 'Dec', completed: 42, accuracy: 99.9, discrepancies: 18 },
-  ];
-
-  const inventoryDistributionData = [
-    { name: 'Electronics', value: 35, color: '#ef4444', count: 4350 },
-    { name: 'Furniture', value: 20, color: '#f97316', count: 2480 },
-    { name: 'Apparel', value: 18, color: '#eab308', count: 2230 },
-    { name: 'Food', value: 15, color: '#22c55e', count: 1860 },
-    { name: 'Medical', value: 7, color: '#06b6d4', count: 870 },
-    { name: 'Others', value: 5, color: '#8b5cf6', count: 620 },
-  ];
-
-  const locationPerformanceData = [
-    { name: 'Warehouse A', count: 4250, accuracy: 99.2, efficiency: 94, value: 125000 },
-    { name: 'Warehouse B', count: 3850, accuracy: 98.8, efficiency: 92, value: 98000 },
-    { name: 'Warehouse C', count: 2950, accuracy: 99.5, efficiency: 96, value: 76000 },
-    { name: 'Store A', count: 1850, accuracy: 98.5, efficiency: 88, value: 45000 },
-    { name: 'Store B', count: 1450, accuracy: 98.2, efficiency: 85, value: 32000 },
-    { name: 'Cold Storage', count: 890, accuracy: 99.1, efficiency: 91, value: 28000 },
-  ];
-
-  const discrepancyTrendData = [
-    { date: 'Week 1', count: 24, resolved: 20, pending: 4 },
-    { date: 'Week 2', count: 28, resolved: 24, pending: 4 },
-    { date: 'Week 3', count: 22, resolved: 20, pending: 2 },
-    { date: 'Week 4', count: 18, resolved: 17, pending: 1 },
-    { date: 'Week 5', count: 15, resolved: 14, pending: 1 },
-    { date: 'Week 6', count: 12, resolved: 12, pending: 0 },
-  ];
-
-  const recentStocktakes = [
-    { id: 'ST-2024-001', name: 'Year-End Physical Count', date: '2024-12-15', status: 'completed', accuracy: 99.3, items: 12450, location: 'Main Warehouse' },
-    { id: 'ST-2024-002', name: 'Zone A - Electronics', date: '2024-12-10', status: 'completed', accuracy: 99.33, items: 3450, location: 'Zone A' },
-    { id: 'ST-2024-003', name: 'Cycle Count - High Value', date: '2024-12-05', status: 'completed', accuracy: 99.62, items: 520, location: 'Vault' },
-    { id: 'ST-2024-006', name: 'Rapid Cycle - Fast Movers', date: '2024-12-18', status: 'in_progress', accuracy: 99.45, items: 2500, location: 'Picking Zone' },
-  ];
-
-  const topPerformingLocations = [
-    { name: 'Warehouse C', accuracy: 99.5, efficiency: 96, trend: '+2.3%' },
-    { name: 'Warehouse A', accuracy: 99.2, efficiency: 94, trend: '+1.8%' },
-    { name: 'Cold Storage', accuracy: 99.1, efficiency: 91, trend: '+1.2%' },
-    { name: 'Warehouse B', accuracy: 98.8, efficiency: 92, trend: '+0.9%' },
-    { name: 'Store A', accuracy: 98.5, efficiency: 88, trend: '+0.5%' },
-  ];
-
-  const alerts = [
-    { id: 1, title: 'Low Stock Alert', message: 'Product A below reorder point', priority: 'high', time: '10 min ago' },
-    { id: 2, title: 'Batch Expiry Warning', message: 'BATCH-005 expires in 10 days', priority: 'medium', time: '1 hour ago' },
-    { id: 3, title: 'Sync Failed', message: 'ERP connection timeout', priority: 'critical', time: '2 hours ago' },
-    { id: 4, title: 'Device Offline', message: 'RFID Scanner #RF-1042 offline', priority: 'medium', time: '3 hours ago' },
-  ];
-
-  const getStatusBadge = (status) => {
-    const config = {
-      completed: { label: 'Completed', color: 'bg-green-100 text-green-700' },
-      in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
-      scheduled: { label: 'Scheduled', color: 'bg-yellow-100 text-yellow-700' },
-    };
-    const cfg = config[status] || config.completed;
-    return <Badge className={cn("border-0", cfg.color)}>{cfg.label}</Badge>;
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
-  };
-
+// Mock Data
+const MOCK_DATA = {
   // KPI Data
-  const kpis = {
+  kpis: {
     totalInventoryValue: 1250000,
     inventoryValueChange: '+8.5',
     totalItems: 38420,
@@ -197,23 +102,206 @@ const DashboardPage = () => {
     stocktakesChange: '+2',
     totalStocktakes: 142,
     stocktakesGrowth: '+18.5',
+  },
+
+  // Event Stats
+  eventStats: {
+    currentEvents: 3,
+    upcomingEvents: 5,
+    completedEvents: 12,
+    totalScanned: 12450
+  },
+
+  // Chart Data
+  inventoryTrend: [
+    { date: 'Dec 15', count: 12450, accuracy: 98.5 },
+    { date: 'Dec 16', count: 12480, accuracy: 98.7 },
+    { date: 'Dec 17', count: 12520, accuracy: 99.0 },
+    { date: 'Dec 18', count: 12560, accuracy: 99.2 },
+    { date: 'Dec 19', count: 12580, accuracy: 99.4 },
+    { date: 'Dec 20', count: 12600, accuracy: 99.5 },
+    { date: 'Dec 21', count: 12650, accuracy: 99.6 },
+  ],
+
+  stocktakePerformance: [
+    { name: 'Jan', completed: 12, accuracy: 98.2 },
+    { name: 'Feb', completed: 15, accuracy: 98.5 },
+    { name: 'Mar', completed: 18, accuracy: 98.8 },
+    { name: 'Apr', completed: 20, accuracy: 99.0 },
+    { name: 'May', completed: 22, accuracy: 99.1 },
+    { name: 'Jun', completed: 25, accuracy: 99.3 },
+    { name: 'Jul', completed: 28, accuracy: 99.4 },
+    { name: 'Aug', completed: 30, accuracy: 99.5 },
+    { name: 'Sep', completed: 32, accuracy: 99.6 },
+    { name: 'Oct', completed: 35, accuracy: 99.7 },
+    { name: 'Nov', completed: 38, accuracy: 99.8 },
+    { name: 'Dec', completed: 42, accuracy: 99.9 },
+  ],
+
+  inventoryDistribution: [
+    { name: 'Electronics', value: 35, color: '#ef4444' },
+    { name: 'Furniture', value: 20, color: '#f97316' },
+    { name: 'Apparel', value: 18, color: '#eab308' },
+    { name: 'Food', value: 15, color: '#22c55e' },
+    { name: 'Medical', value: 7, color: '#06b6d4' },
+    { name: 'Others', value: 5, color: '#8b5cf6' },
+  ],
+
+  locationPerformance: [
+    { name: 'Warehouse A', accuracy: 99.2, efficiency: 94 },
+    { name: 'Warehouse B', accuracy: 98.8, efficiency: 92 },
+    { name: 'Warehouse C', accuracy: 99.5, efficiency: 96 },
+    { name: 'Store A', accuracy: 98.5, efficiency: 88 },
+    { name: 'Store B', accuracy: 98.2, efficiency: 85 },
+    { name: 'Cold Storage', accuracy: 99.1, efficiency: 91 },
+  ],
+
+  discrepancyTrend: [
+    { date: 'Week 1', resolved: 20, pending: 4 },
+    { date: 'Week 2', resolved: 24, pending: 4 },
+    { date: 'Week 3', resolved: 20, pending: 2 },
+    { date: 'Week 4', resolved: 17, pending: 1 },
+    { date: 'Week 5', resolved: 14, pending: 1 },
+    { date: 'Week 6', resolved: 12, pending: 0 },
+  ],
+
+  recentStocktakes: [
+    { id: 'ST-2024-001', name: 'Year-End Physical Count', date: '2024-12-15', status: 'completed', accuracy: 99.3, location: 'Main Warehouse' },
+    { id: 'ST-2024-002', name: 'Zone A - Electronics', date: '2024-12-10', status: 'completed', accuracy: 99.33, location: 'Zone A' },
+    { id: 'ST-2024-003', name: 'Cycle Count - High Value', date: '2024-12-05', status: 'completed', accuracy: 99.62, location: 'Vault' },
+    { id: 'ST-2024-006', name: 'Rapid Cycle - Fast Movers', date: '2024-12-18', status: 'in_progress', accuracy: 99.45, location: 'Picking Zone' },
+  ],
+
+  topLocations: [
+    { name: 'Warehouse C', accuracy: 99.5, trend: '+2.3%' },
+    { name: 'Warehouse A', accuracy: 99.2, trend: '+1.8%' },
+    { name: 'Cold Storage', accuracy: 99.1, trend: '+1.2%' },
+    { name: 'Warehouse B', accuracy: 98.8, trend: '+0.9%' },
+    { name: 'Store A', accuracy: 98.5, trend: '+0.5%' },
+  ],
+
+  alerts: [
+    { id: 1, title: 'Low Stock Alert', message: 'Product A below reorder point', priority: 'high', time: '10 min ago' },
+    { id: 2, title: 'Batch Expiry Warning', message: 'BATCH-005 expires in 10 days', priority: 'medium', time: '1 hour ago' },
+    { id: 3, title: 'Sync Failed', message: 'ERP connection timeout', priority: 'critical', time: '2 hours ago' },
+    { id: 4, title: 'Device Offline', message: 'RFID Scanner #RF-1042 offline', priority: 'medium', time: '3 hours ago' },
+  ],
+
+  events: {
+    live: [
+      { id: "evt-001", uniqueId: "EVT-2024-001", name: "Annual Inventory Count 2024", status: "live", datetime: "2024-03-25T09:00:00Z", customerName: "Apple Singapore", storeName: "Orchard Road Store", location: "Singapore", totalUsers: 12, progress: 50 },
+      { id: "evt-002", uniqueId: "EVT-2024-002", name: "Electronics Quarterly Audit", status: "live", datetime: "2024-03-20T10:00:00Z", customerName: "Samsung Electronics", storeName: "Jurong East Store", location: "Singapore", totalUsers: 8, progress: 51 },
+      { id: "evt-003", uniqueId: "EVT-2024-003", name: "Clothing Store Inventory", status: "live", datetime: "2024-03-22T11:30:00Z", customerName: "Zara Retail", storeName: "VivoCity Store", location: "Singapore", totalUsers: 6, progress: 100 },
+    ],
+    upcoming: [
+      { id: "evt-004", uniqueId: "EVT-2024-004", name: "Furniture Warehouse Audit", status: "upcoming", datetime: "2024-04-05T08:00:00Z", customerName: "IKEA Singapore", storeName: "Tampines Store", location: "Singapore", totalUsers: 10, progress: 0 },
+      { id: "evt-005", uniqueId: "EVT-2024-005", name: "Sports Equipment Stock Take", status: "upcoming", datetime: "2024-04-10T09:00:00Z", customerName: "Decathlon", storeName: "Sports Hub", location: "Singapore", totalUsers: 7, progress: 0 },
+      { id: "evt-006", uniqueId: "EVT-2024-006", name: "Grocery Store Count", status: "upcoming", datetime: "2024-04-15T10:00:00Z", customerName: "FairPrice", storeName: "Jurong Point", location: "Singapore", totalUsers: 15, progress: 0 },
+    ],
+    completed: [
+      { id: "evt-009", uniqueId: "EVT-2023-001", name: "Year-End Inventory 2023", status: "completed", datetime: "2023-12-15T09:00:00Z", customerName: "Apple Singapore", storeName: "Orchard Road Store", location: "Singapore", totalUsers: 12, progress: 100 },
+      { id: "evt-010", uniqueId: "EVT-2023-002", name: "Quarterly Electronics Review", status: "completed", datetime: "2023-11-10T10:00:00Z", customerName: "Samsung Electronics", storeName: "Jurong East Store", location: "Singapore", totalUsers: 8, progress: 100 },
+    ],
+  },
+
+  bottomStats: [
+    { icon: Scan, label: "Today's Counts", value: "2,450", color: "text-red-600", bgColor: "bg-red-50" },
+    { icon: Truck, label: "Pending Transfers", value: "8", color: "text-blue-600", bgColor: "bg-blue-50" },
+    { icon: Users, label: "Active Users", value: "24", color: "text-green-600", bgColor: "bg-green-50" },
+    { icon: Boxes, label: "Low Stock Items", value: "12", color: "text-orange-600", bgColor: "bg-orange-50" },
+    { icon: Calendar, label: "Upcoming Expiries", value: "45", color: "text-purple-600", bgColor: "bg-purple-50" },
+  ]
+};
+
+const DashboardPage = () => {
+  const router = useRouter();
+  const [dateRange, setDateRange] = useState('week');
+  const [selectedWarehouse, setSelectedWarehouse] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [expandedEventTypes, setExpandedEventTypes] = useState({
+    live: true,
+    upcoming: false,
+    completed: false,
+  });
+
+  const getStatusBadge = (status) => {
+    const config = {
+      completed: { label: 'Completed', color: 'bg-green-100 text-green-700', icon: CheckCircle },
+      in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700', icon: RefreshCw },
+      live: { label: 'Live', color: 'bg-green-100 text-green-700', icon: PlayCircle },
+      upcoming: { label: 'Upcoming', color: 'bg-blue-100 text-blue-700', icon: CalendarClock },
+      scheduled: { label: 'Scheduled', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
+    };
+    const cfg = config[status] || config.completed;
+    const Icon = cfg.icon;
+    return (
+      <Badge className={cn("border-0 flex items-center gap-1", cfg.color)}>
+        <Icon size={12} />
+        {cfg.label}
+      </Badge>
+    );
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      setSearchQuery("");
+      setStatusFilter("all");
+    }, 1500);
+  };
+
+  const handleEventClick = (event) => {
+    if (event.status === 'live') {
+      router.push(`/dashboard/live/event-dashboard/${event.id}`);
+    }
+  };
+
+  const toggleEventType = (type) => {
+    setExpandedEventTypes(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  // Filter events
+  const getFilteredEvents = (events) => {
+    return events.filter(event => {
+      const matchesSearch = searchQuery === "" ||
+        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.storeName.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesStatus = statusFilter === "all" || event.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  };
+
+  const filteredLiveEvents = getFilteredEvents(MOCK_DATA.events.live);
+  const filteredUpcomingEvents = getFilteredEvents(MOCK_DATA.events.upcoming);
+  const filteredCompletedEvents = getFilteredEvents(MOCK_DATA.events.completed);
+
+  const eventCategories = [
+    { id: 'live', title: 'Live Events', icon: PlayCircle, color: 'text-green-600', bgColor: 'bg-green-100', count: filteredLiveEvents.length, events: filteredLiveEvents, totalUsers: filteredLiveEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
+    { id: 'upcoming', title: 'Upcoming Events', icon: CalendarClock, color: 'text-blue-600', bgColor: 'bg-blue-100', count: filteredUpcomingEvents.length, events: filteredUpcomingEvents, totalUsers: filteredUpcomingEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
+    { id: 'completed', title: 'Completed Events', icon: CheckCircle, color: 'text-gray-600', bgColor: 'bg-gray-100', count: filteredCompletedEvents.length, events: filteredCompletedEvents, totalUsers: filteredCompletedEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
+  ];
+
   return (
-    <div className="min-h-screen bg-white rounded-md">
+    <div className="min-h-screen bg-gray-50 rounded-md">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#F5EEE9] px-6 py-4 rounded-md">
+      <div className=" z-10  border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-black">Dashboard</h1>
-            <p className="text-black/50 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-500 text-sm mt-1">
               Welcome back! Here's what's happening with your inventory today.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[140px] border-[#F5EEE9]">
+                <SelectTrigger className="w-[140px] shadow-md">
                   <SelectValue placeholder="Date Range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -224,29 +312,28 @@ const DashboardPage = () => {
                   <SelectItem value="year">This Year</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={selectedWarehouse} onValueChange={setSelectedWarehouse}>
-                <SelectTrigger className="w-[150px] border-[#F5EEE9]">
-                  <SelectValue placeholder="All Warehouses" />
+              <Select value={selectedWarehouse} onValueChange={setSelectedWarehouse} >
+                <SelectTrigger className="w-[150px] shadow-md">
+                  <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
                   <SelectItem value="wh-a">Warehouse A</SelectItem>
                   <SelectItem value="wh-b">Warehouse B</SelectItem>
                   <SelectItem value="wh-c">Warehouse C</SelectItem>
-                  <SelectItem value="store-a">Store A</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="border-[#F5EEE9]"
+            <Button
+              variant="outline"
+              size="icon"
               onClick={handleRefresh}
               disabled={refreshing}
+              className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md"
             >
               <RefreshCw size={18} className={cn(refreshing && "animate-spin")} />
             </Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white">
+            <Button className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md">
               <Download size={16} className="mr-2" />
               Export Report
             </Button>
@@ -255,127 +342,180 @@ const DashboardPage = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-6 gap-4">
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
+        {/* KPI Cards Row 1 - Inventory Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-green-50 to-white">
+            <CardContent className="p-4 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-black/50">Total Inventory Value</p>
-                  <p className="text-2xl font-bold text-black mt-1">${kpis.totalInventoryValue.toLocaleString()}</p>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Total Inventory Value</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">${MOCK_DATA.kpis.totalInventoryValue.toLocaleString()}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.inventoryValueChange}%</span>
-                    <span className="text-xs text-black/40">vs last month</span>
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.inventoryValueChange}%</span>
                   </div>
-                </div>
-                <div className="p-3 bg-red-50 rounded-full">
-                  <DollarSign size={24} className="text-red-600" />
                 </div>
               </div>
             </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <DollarSign size={120} className="text-red-600" />
+    </div> */}
           </Card>
 
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-blue-50 to-white">
+            <CardContent className="p-4 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-black/50">Total Items Counted</p>
-                  <p className="text-2xl font-bold text-black mt-1">{kpis.totalItems.toLocaleString()}</p>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Total Items Counted</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.kpis.totalItems.toLocaleString()}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.itemsChange}%</span>
-                    <span className="text-xs text-black/40">vs last month</span>
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.itemsChange}%</span>
                   </div>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-full">
-                  <Package size={24} className="text-blue-600" />
                 </div>
               </div>
             </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <Package size={120} className="text-blue-600" />
+    </div> */}
           </Card>
 
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative  bg-gradient-to-br from-purple-50 to-white">
+            <CardContent className="p-4 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-black/50">Stocktake Accuracy</p>
-                  <p className="text-2xl font-bold text-green-600 mt-1">{kpis.stocktakeAccuracy}%</p>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Stocktake Accuracy</p>
+                  <p className="text-2xl font-bold text-green-600 mt-1">{MOCK_DATA.kpis.stocktakeAccuracy}%</p>
                   <div className="flex items-center gap-1 mt-1">
                     <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.accuracyChange}%</span>
-                    <span className="text-xs text-black/40">improvement</span>
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.accuracyChange}%</span>
                   </div>
-                </div>
-                <div className="p-3 bg-green-50 rounded-full">
-                  <Target size={24} className="text-green-600" />
                 </div>
               </div>
             </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <Target size={120} className="text-green-600" />
+    </div> */}
           </Card>
 
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-orange-50 to-white">
+            <CardContent className="p-4 relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-black/50">Pending Discrepancies</p>
-                  <p className="text-2xl font-bold text-orange-600 mt-1">{kpis.pendingDiscrepancies}</p>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Pending Discrepancies</p>
+                  <p className="text-2xl font-bold text-orange-600 mt-1">{MOCK_DATA.kpis.pendingDiscrepancies}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <TrendingDown size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.discrepanciesChange}%</span>
-                    <span className="text-xs text-black/40">reduction</span>
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.discrepanciesChange}%</span>
                   </div>
                 </div>
-                <div className="p-3 bg-orange-50 rounded-full">
-                  <AlertTriangle size={24} className="text-orange-600" />
+              </div>
+            </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <AlertTriangle size={120} className="text-orange-600" />
+    </div> */}
+          </Card>
+
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-green-50 to-white">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Active Stocktakes</p>
+                  <p className="text-2xl font-bold text-blue-600 mt-1">{MOCK_DATA.kpis.activeStocktakes}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <TrendingUp size={12} className="text-green-600" />
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.stocktakesChange}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <ClipboardList size={120} className="text-purple-600" />
+    </div> */}
+          </Card>
+
+          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-blue-50 to-white">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Total Stocktakes</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.kpis.totalStocktakes}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <TrendingUp size={12} className="text-green-600" />
+                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.stocktakesGrowth}%</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
+      <Activity size={120} className="text-teal-600" />
+    </div> */}
+          </Card>
+        </div>
+
+        {/* KPI Cards Row 2 - Event Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-green-50 to-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-500">Current Events</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.currentEvents}</p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <PlayCircle size={24} className="text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
+          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-blue-50 to-white">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-black/50">Active Stocktakes</p>
-                  <p className="text-2xl font-bold text-blue-600 mt-1">{kpis.activeStocktakes}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.stocktakesChange}</span>
-                    <span className="text-xs text-black/40">active</span>
-                  </div>
+                  <p className="text-xs text-gray-500">Upcoming Events</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.upcomingEvents}</p>
                 </div>
-                <div className="p-3 bg-purple-50 rounded-full">
-                  <ClipboardList size={24} className="text-purple-600" />
+                <div className="p-3 bg-blue-100 rounded-xl">
+                  <CalendarClock size={24} className="text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-[#F5EEE9] hover:shadow-md transition-shadow">
+          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-purple-50 to-white">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-black/50">Total Stocktakes</p>
-                  <p className="text-2xl font-bold text-black mt-1">{kpis.totalStocktakes}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{kpis.stocktakesGrowth}%</span>
-                    <span className="text-xs text-black/40">YoY growth</span>
-                  </div>
+                  <p className="text-xs text-gray-500">Completed Events</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.completedEvents}</p>
                 </div>
-                <div className="p-3 bg-teal-50 rounded-full">
-                  <Activity size={24} className="text-teal-600" />
+                <div className="p-3 bg-purple-100 rounded-xl">
+                  <CheckSquare size={24} className="text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-orange-50 to-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-500">Total Scanned</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.totalScanned.toLocaleString()}</p>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-xl">
+                  <Scan size={24} className="text-orange-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Charts Row 1 */}
-        <div className="grid grid-cols-3 gap-6">
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Inventory Trend Chart */}
-          <Card className="border-[#F5EEE9] col-span-2">
+          <Card className="border-gray-200 lg:col-span-2">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
@@ -397,10 +537,10 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart data={inventoryTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" stroke="#888888" />
-                  <YAxis yAxisId="left" stroke="#888888" />
+                <ComposedChart data={MOCK_DATA.inventoryTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="date" stroke="#9ca3af" />
+                  <YAxis yAxisId="left" stroke="#9ca3af" />
                   <YAxis yAxisId="right" orientation="right" stroke="#ef4444" />
                   <ReTooltip />
                   <Legend />
@@ -411,21 +551,17 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          {/* Inventory Distribution Pie Chart */}
-          <Card className="border-[#F5EEE9]">
+          {/* Inventory Distribution */}
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Inventory Distribution</CardTitle>
-                  <CardDescription>By category</CardDescription>
-                </div>
-              </div>
+              <CardTitle className="text-lg font-semibold">Inventory Distribution</CardTitle>
+              <CardDescription>By category</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
                 <RePieChart>
                   <Pie
-                    data={inventoryDistributionData}
+                    data={MOCK_DATA.inventoryDistribution}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -435,7 +571,7 @@ const DashboardPage = () => {
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
-                    {inventoryDistributionData.map((entry, index) => (
+                    {MOCK_DATA.inventoryDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -443,11 +579,11 @@ const DashboardPage = () => {
                 </RePieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap justify-center gap-3 mt-2">
-                {inventoryDistributionData.map((item) => (
+                {MOCK_DATA.inventoryDistribution.map((item) => (
                   <div key={item.name} className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-xs text-black/70">{item.name}</span>
-                    <span className="text-xs font-medium">{item.value}%</span>
+                    <span className="text-xs text-gray-600">{item.name}</span>
+                    <span className="text-xs font-medium text-gray-900">{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -455,20 +591,19 @@ const DashboardPage = () => {
           </Card>
         </div>
 
-        {/* Charts Row 2 */}
-        <div className="grid grid-cols-3 gap-6">
-          {/* Stocktake Performance */}
-          <Card className="border-[#F5EEE9]">
+        {/* Performance Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">Stocktake Performance</CardTitle>
               <CardDescription>Monthly completed stocktakes</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={stocktakePerformanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="name" stroke="#888888" />
-                  <YAxis stroke="#888888" />
+                <BarChart data={MOCK_DATA.stocktakePerformance}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#9ca3af" />
+                  <YAxis stroke="#9ca3af" />
                   <ReTooltip />
                   <Bar dataKey="completed" fill="#ef4444" radius={[4, 4, 0, 0]} name="Completed Stocktakes" />
                 </BarChart>
@@ -476,18 +611,17 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          {/* Accuracy Trend */}
-          <Card className="border-[#F5EEE9]">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">Accuracy Trend</CardTitle>
               <CardDescription>Stocktake accuracy over time</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
-                <ReLineChart data={stocktakePerformanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="name" stroke="#888888" />
-                  <YAxis domain={[95, 100]} stroke="#888888" />
+                <ReLineChart data={MOCK_DATA.stocktakePerformance}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#9ca3af" />
+                  <YAxis domain={[95, 100]} stroke="#9ca3af" />
                   <ReTooltip />
                   <Line type="monotone" dataKey="accuracy" stroke="#22c55e" strokeWidth={2} dot={{ fill: '#22c55e', r: 4 }} name="Accuracy %" />
                 </ReLineChart>
@@ -503,46 +637,39 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          {/* Discrepancy Resolution */}
-          <Card className="border-[#F5EEE9]">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">Discrepancy Resolution</CardTitle>
-              <CardDescription>Weekly discrepancy trends</CardDescription>
+              <CardDescription>Weekly resolution trends</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={discrepancyTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" stroke="#888888" />
-                  <YAxis stroke="#888888" />
+                <BarChart data={MOCK_DATA.discrepancyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="date" stroke="#9ca3af" />
+                  <YAxis stroke="#9ca3af" />
                   <ReTooltip />
-                  <Bar dataKey="count" stackId="a" fill="#ef4444" name="Total Discrepancies" />
-                  <Bar dataKey="resolved" stackId="a" fill="#22c55e" name="Resolved" />
-                  <Bar dataKey="pending" stackId="a" fill="#eab308" name="Pending" />
+                  <Bar dataKey="resolved" fill="#22c55e" name="Resolved" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pending" fill="#eab308" name="Pending" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
 
-        {/* Charts Row 3 */}
-        <div className="grid grid-cols-2 gap-6">
-          {/* Location Performance */}
-          <Card className="border-[#F5EEE9]">
+        {/* Location Performance & Recent Stocktakes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Location Performance</CardTitle>
-                  <CardDescription>Accuracy and efficiency by location</CardDescription>
-                </div>
-              </div>
+              <CardTitle className="text-lg font-semibold">Location Performance</CardTitle>
+              <CardDescription>Accuracy and efficiency by location</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={locationPerformanceData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" domain={[80, 100]} stroke="#888888" />
-                  <YAxis type="category" dataKey="name" stroke="#888888" width={100} />
+                <BarChart data={MOCK_DATA.locationPerformance} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis type="number" domain={[80, 100]} stroke="#9ca3af" />
+                  <YAxis type="category" dataKey="name" stroke="#9ca3af" width={100} />
                   <ReTooltip />
                   <Legend />
                   <Bar dataKey="accuracy" fill="#ef4444" name="Accuracy %" radius={[0, 4, 4, 0]} />
@@ -552,8 +679,7 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Stocktakes */}
-          <Card className="border-[#F5EEE9]">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
@@ -567,9 +693,9 @@ const DashboardPage = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentStocktakes.map((stocktake) => (
-                  <div key={stocktake.id} className="flex items-center justify-between p-3 hover:bg-[#F5EEE9] rounded-lg transition-colors cursor-pointer">
+              <div className="space-y-3">
+                {MOCK_DATA.recentStocktakes.map((stocktake) => (
+                  <div key={stocktake.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "p-2 rounded-full",
@@ -582,12 +708,11 @@ const DashboardPage = () => {
                         )}
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{stocktake.name}</p>
+                        <p className="font-medium text-sm text-gray-900">{stocktake.name}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-black/40">{stocktake.date}</span>
-                          <span className="text-xs text-black/40">•</span>
-                          <span className="text-xs text-black/40">{stocktake.location}</span>
-                          <span className="text-xs text-black/40">•</span>
+                          <span className="text-xs text-gray-500">{stocktake.date}</span>
+                          <span className="text-xs text-gray-500">•</span>
+                          <span className="text-xs text-gray-500">{stocktake.location}</span>
                           <span className="text-xs font-medium text-green-600">{stocktake.accuracy}%</span>
                         </div>
                       </div>
@@ -600,31 +725,187 @@ const DashboardPage = () => {
           </Card>
         </div>
 
+        {/* Events Management Section */}
+        <Card className="border-gray-200">
+          <CardHeader>
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+              <div>
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <ClipboardCheck className="h-6 w-6 text-red-600" />
+                  Events Management
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Click on any live event to view stock take actions
+                </CardDescription>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                <div className="relative flex-1 sm:flex-none sm:w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search events..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Events</SelectItem>
+                    <SelectItem value="live">Live Events</SelectItem>
+                    <SelectItem value="upcoming">Upcoming Events</SelectItem>
+                    <SelectItem value="completed">Completed Events</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="space-y-4">
+              {eventCategories.map((category) => (
+                <div key={category.id} className="border-b border-gray-100 last:border-0">
+                  {/* Category Header */}
+                  <div
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => toggleEventType(category.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        {expandedEventTypes[category.id] ? (
+                          <ChevronDown size={18} />
+                        ) : (
+                          <ChevronRight size={18} />
+                        )}
+                      </Button>
+                      <div className={cn("p-2 rounded-lg", category.bgColor)}>
+                        <category.icon className={cn("h-5 w-5", category.color)} />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{category.title}</h3>
+                        <p className="text-sm text-gray-500">
+                          {category.id === "live" ? "Currently active events" :
+                            category.id === "upcoming" ? "Scheduled future events" :
+                              "Completed events"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900">{category.count}</div>
+                        <div className="text-xs text-gray-500">events</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900">{category.totalUsers}</div>
+                        <div className="text-xs text-gray-500">users</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expanded Content */}
+                  {expandedEventTypes[category.id] && (
+                    <div className="px-4 pb-4">
+                      {category.events.length > 0 ? (
+                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="bg-gray-50">
+                                <TableHead className="font-medium">Event ID</TableHead>
+                                <TableHead className="font-medium">Event Name</TableHead>
+                                <TableHead className="font-medium">Date & Time</TableHead>
+                                <TableHead className="font-medium">Customer</TableHead>
+                                <TableHead className="font-medium">Store</TableHead>
+                                <TableHead className="font-medium">Status</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {category.events.map((event) => (
+                                <TableRow
+                                  key={event.id}
+                                  className={cn(
+                                    "transition-colors",
+                                    event.status === 'live' && "cursor-pointer hover:bg-green-50"
+                                  )}
+                                  onClick={() => handleEventClick(event)}
+                                >
+                                  <TableCell>
+                                    <span className="font-mono text-sm">{event.uniqueId}</span>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="font-medium text-gray-900">{event.name}</div>
+                                    {event.status === 'live' && (
+                                      <div className="text-xs text-green-600 mt-1">Click to open actions</div>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="text-sm text-gray-900">
+                                      {new Date(event.datetime).toLocaleDateString()}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      {new Date(event.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center gap-2">
+                                      <Building className="h-4 w-4 text-gray-400" />
+                                      <span className="text-sm text-gray-900">{event.customerName}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center gap-2">
+                                      <Store className="h-4 w-4 text-gray-400" />
+                                      <span className="text-sm text-gray-900">{event.storeName}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>{getStatusBadge(event.status)}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <h4 className="font-semibold text-gray-900 mb-2">No Events Found</h4>
+                          <p className="text-gray-600 text-sm">No events match your current search criteria.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter className="border-t border-gray-200 p-4">
+            <div className="text-sm text-gray-600">
+              Showing {eventCategories.reduce((sum, cat) => sum + cat.count, 0)} events across {eventCategories.length} categories
+            </div>
+          </CardFooter>
+        </Card>
+
         {/* Bottom Section */}
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Top Performing Locations */}
-          <Card className="border-[#F5EEE9]">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">Top Performing Locations</CardTitle>
               <CardDescription>Highest accuracy rates</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topPerformingLocations.map((location, idx) => (
+                {MOCK_DATA.topLocations.map((location, idx) => (
                   <div key={idx} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
                         <Award size={14} className="text-red-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{location.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-black/50">Accuracy: {location.accuracy}%</span>
-                          <span className="text-xs text-black/50">Efficiency: {location.efficiency}%</span>
-                        </div>
+                        <p className="font-medium text-sm text-gray-900">{location.name}</p>
+                        <p className="text-xs text-gray-500 mt-1">Accuracy: {location.accuracy}%</p>
                       </div>
                     </div>
-                    <Badge className="bg-green-100 text-green-700">{location.trend}</Badge>
+                    <Badge className="bg-green-100 text-green-700 border-0">{location.trend}</Badge>
                   </div>
                 ))}
               </div>
@@ -632,7 +913,7 @@ const DashboardPage = () => {
           </Card>
 
           {/* Active Alerts */}
-          <Card className="border-[#F5EEE9]">
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
@@ -646,25 +927,25 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {alerts.map((alert) => (
-                  <div key={alert.id} className="flex items-start gap-3 p-2 hover:bg-[#F5EEE9] rounded-lg cursor-pointer">
+                {MOCK_DATA.alerts.map((alert) => (
+                  <div key={alert.id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
                     <div className={cn(
                       "p-1.5 rounded-full",
-                      alert.priority === 'critical' ? "bg-red-100" : 
-                      alert.priority === 'high' ? "bg-orange-100" : "bg-yellow-100"
+                      alert.priority === 'critical' ? "bg-red-100" :
+                        alert.priority === 'high' ? "bg-orange-100" : "bg-yellow-100"
                     )}>
                       {alert.priority === 'critical' ? (
-                        <AlertCircle size={12} className="text-red-600" />
+                        <AlertCircleIcon size={12} className="text-red-600" />
                       ) : (
                         <AlertTriangle size={12} className="text-orange-600" />
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{alert.title}</p>
-                        <span className="text-xs text-black/40">{alert.time}</span>
+                        <p className="text-sm font-medium text-gray-900">{alert.title}</p>
+                        <span className="text-xs text-gray-400">{alert.time}</span>
                       </div>
-                      <p className="text-xs text-black/50 mt-0.5">{alert.message}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{alert.message}</p>
                     </div>
                   </div>
                 ))}
@@ -672,8 +953,8 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Actions & Insights */}
-          <Card className="border-[#F5EEE9]">
+          {/* Quick Insights */}
+          <Card className="border-gray-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold">Quick Insights</CardTitle>
               <CardDescription>Key metrics at a glance</CardDescription>
@@ -681,31 +962,31 @@ const DashboardPage = () => {
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-[#F5EEE9] rounded-lg">
+                  <div className="p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Target size={14} className="text-red-600" />
-                      <span className="text-xs text-black/50">Accuracy Goal</span>
+                      <span className="text-xs text-gray-500">Accuracy Goal</span>
                     </div>
-                    <p className="text-xl font-bold">99.5%</p>
+                    <p className="text-xl font-bold text-gray-900">99.5%</p>
                     <Progress value={92} className="h-1.5 mt-2" />
                     <p className="text-xs text-green-600 mt-1">0.3% to target</p>
                   </div>
-                  <div className="p-3 bg-[#F5EEE9] rounded-lg">
+                  <div className="p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Clock size={14} className="text-blue-600" />
-                      <span className="text-xs text-black/50">Avg. Stocktake Time</span>
+                      <span className="text-xs text-gray-500">Avg. Stocktake Time</span>
                     </div>
-                    <p className="text-xl font-bold">2.4 hrs</p>
+                    <p className="text-xl font-bold text-gray-900">2.4 hrs</p>
                     <p className="text-xs text-green-600 mt-1">↓ 15% faster</p>
                   </div>
                 </div>
                 <div className="p-3 bg-gradient-to-r from-red-50 to-transparent rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Next Scheduled Stocktake</span>
+                    <span className="text-sm font-medium text-gray-900">Next Scheduled Stocktake</span>
                     <CalendarDays size={14} className="text-red-600" />
                   </div>
-                  <p className="text-lg font-bold">December Cycle Count</p>
-                  <p className="text-xs text-black/50 mt-1">Scheduled for Dec 20, 2024</p>
+                  <p className="text-lg font-bold text-gray-900">December Cycle Count</p>
+                  <p className="text-xs text-gray-500 mt-1">Scheduled for Dec 20, 2024</p>
                   <Button variant="link" className="p-0 h-auto mt-2 text-red-600">
                     View Details
                     <ChevronRight size={14} className="ml-1" />
@@ -717,55 +998,23 @@ const DashboardPage = () => {
         </div>
 
         {/* Bottom Stats Bar */}
-        <div className="grid grid-cols-5 gap-4 pt-2">
-          <div className="flex items-center gap-3 p-3 bg-[#F5EEE9] rounded-lg">
-            <Scan size={20} className="text-red-600" />
-            <div>
-              <p className="text-xs text-black/50">Today's Counts</p>
-              <p className="text-lg font-bold">2,450</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {MOCK_DATA.bottomStats.map((stat, idx) => (
+            <div key={idx} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all">
+              <div className={cn("p-2 rounded-lg", stat.bgColor)}>
+                <stat.icon size={20} className={stat.color} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">{stat.label}</p>
+                <p className="text-lg font-bold text-gray-900">{stat.value}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-[#F5EEE9] rounded-lg">
-            <Truck size={20} className="text-blue-600" />
-            <div>
-              <p className="text-xs text-black/50">Pending Transfers</p>
-              <p className="text-lg font-bold">8</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-[#F5EEE9] rounded-lg">
-            <Users size={20} className="text-green-600" />
-            <div>
-              <p className="text-xs text-black/50">Active Users</p>
-              <p className="text-lg font-bold">24</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-[#F5EEE9] rounded-lg">
-            <Boxes size={20} className="text-purple-600" />
-            <div>
-              <p className="text-xs text-black/50">Low Stock Items</p>
-              <p className="text-lg font-bold text-orange-600">12</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-[#F5EEE9] rounded-lg">
-            <Calendar size={20} className="text-teal-600" />
-            <div>
-              <p className="text-xs text-black/50">Upcoming Expiries</p>
-              <p className="text-lg font-bold">45</p>
-            </div>
-          </div>
+          ))}
         </div>
+
       </div>
     </div>
   );
 };
-
-// Additional icon component
-const AlertCircle = ({ size, className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="8" x2="12" y2="12" />
-    <line x1="12" y1="16" x2="12.01" y2="16" />
-  </svg>
-);
 
 export default DashboardPage;
