@@ -37,6 +37,10 @@ import {
   CheckSquare,
   ClipboardCheck,
   AlertCircle as AlertCircleIcon,
+  Settings, // Add this
+  FileText,
+  Zap,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -510,6 +514,49 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Quick Actions Section - Single Horizontal Bar */}
+        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl border border-gray-200 p-3 shadow-md">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Zap size={20} className="text-blue-600" />
+              <span className="text-sm font-semibold text-gray-900">Quick Actions:</span>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
+                <Calendar size={16} className="text-blue-600" />
+                <span className="text-sm font-medium text-gray-700">Schedule Event</span>
+              </Button>
+
+              <div className="w-px h-6 bg-gray-300"></div>
+
+              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
+                <Settings size={16} className="text-purple-600" />
+                <span className="text-sm font-medium text-gray-700">Setup</span>
+              </Button>
+
+              <div className="w-px h-6 bg-gray-300"></div>
+
+              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
+                <PlayCircle size={16} className="text-green-600" />
+                <span className="text-sm font-medium text-gray-700">Go Live</span>
+              </Button>
+
+              <div className="w-px h-6 bg-gray-300"></div>
+
+              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
+                <FileText size={16} className="text-orange-600" />
+                <span className="text-sm font-medium text-gray-700">Tutorial</span>
+              </Button>
+            </div>
+
+            <Button className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md cursor-pointer">
+              Notifications
+              <Bell size={14} className="ml-2" />
+            </Button>
+          </div>
         </div>
 
         {/* Charts Section */}
