@@ -37,10 +37,30 @@ import {
   CheckSquare,
   ClipboardCheck,
   AlertCircle as AlertCircleIcon,
-  Settings, // Add this
+  Settings,
   FileText,
   Zap,
   Bell,
+  Wallet,
+  MessageCircle,
+  PlusCircle,
+  MapPin,
+  Shield,
+  Grid,
+  MessageSquare,
+  Video,
+  FileShare,
+  Users2,
+  Sparkles,
+  Send,
+  Paperclip,
+  Smile,
+  X,
+  ThumbsUp,
+  Phone,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight as ChevronRightIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -69,30 +89,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  LineChart as ReLineChart,
-  Line,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as ReTooltip,
-  Legend,
-  ResponsiveContainer,
-  ComposedChart,
-} from 'recharts';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useRouter } from 'next/navigation';
 
 // Mock Data
 const MOCK_DATA = {
-  // KPI Data
   kpis: {
     totalInventoryValue: 1250000,
     inventoryValueChange: '+8.5',
@@ -108,105 +122,130 @@ const MOCK_DATA = {
     stocktakesGrowth: '+18.5',
   },
 
-  // Event Stats
-  eventStats: {
-    currentEvents: 3,
-    upcomingEvents: 5,
-    completedEvents: 12,
-    totalScanned: 12450
+  eventWallet: {
+    totalCredits: 24,
+    usedCredits: 15,
+    remainingCredits: 9,
+    subscriptions: [
+      { id: 1, name: 'Basic Plan', totalEvents: 10, usedEvents: 6, expiryDate: '2024-12-31' },
+      { id: 2, name: 'Premium Add-on', totalEvents: 8, usedEvents: 4, expiryDate: '2024-11-30' },
+      { id: 3, name: 'One-time Pack', totalEvents: 6, usedEvents: 5, expiryDate: '2025-01-15' },
+    ]
   },
 
-  // Chart Data
-  inventoryTrend: [
-    { date: 'Dec 15', count: 12450, accuracy: 98.5 },
-    { date: 'Dec 16', count: 12480, accuracy: 98.7 },
-    { date: 'Dec 17', count: 12520, accuracy: 99.0 },
-    { date: 'Dec 18', count: 12560, accuracy: 99.2 },
-    { date: 'Dec 19', count: 12580, accuracy: 99.4 },
-    { date: 'Dec 20', count: 12600, accuracy: 99.5 },
-    { date: 'Dec 21', count: 12650, accuracy: 99.6 },
+  locations: [
+    { id: 1, name: 'Warehouse A', type: 'Warehouse', address: '123 Storage Rd', status: 'active', itemCount: 12450, categories: 12 },
+    { id: 2, name: 'Warehouse B', type: 'Warehouse', address: '456 Logistics Ave', status: 'active', itemCount: 8920, categories: 8 },
+    { id: 3, name: 'Orchard Store', type: 'Retail', address: 'Orchard Road', status: 'active', itemCount: 3450, categories: 15 },
+    { id: 4, name: 'Jurong Facility', type: 'Distribution', address: 'Jurong East', status: 'inactive', itemCount: 0, categories: 0 },
   ],
-
-  stocktakePerformance: [
-    { name: 'Jan', completed: 12, accuracy: 98.2 },
-    { name: 'Feb', completed: 15, accuracy: 98.5 },
-    { name: 'Mar', completed: 18, accuracy: 98.8 },
-    { name: 'Apr', completed: 20, accuracy: 99.0 },
-    { name: 'May', completed: 22, accuracy: 99.1 },
-    { name: 'Jun', completed: 25, accuracy: 99.3 },
-    { name: 'Jul', completed: 28, accuracy: 99.4 },
-    { name: 'Aug', completed: 30, accuracy: 99.5 },
-    { name: 'Sep', completed: 32, accuracy: 99.6 },
-    { name: 'Oct', completed: 35, accuracy: 99.7 },
-    { name: 'Nov', completed: 38, accuracy: 99.8 },
-    { name: 'Dec', completed: 42, accuracy: 99.9 },
+  teams: [
+    { id: 1, name: 'Inventory Team A', members: 8, lead: 'John Smith', activeTasks: 3, completedTasks: 12 },
+    { id: 2, name: 'Stocktake Crew B', members: 12, lead: 'Sarah Johnson', activeTasks: 5, completedTasks: 18 },
+    { id: 3, name: 'Audit Specialists', members: 5, lead: 'Mike Chen', activeTasks: 2, completedTasks: 9 },
+    { id: 4, name: 'Quality Control', members: 6, lead: 'Lisa Wong', activeTasks: 4, completedTasks: 15 },
   ],
+  inventory: {
+    totalSKUs: 15420,
+    categories: 24,
+    lowStockItems: 12,
+    outOfStockItems: 5,
+    recentAdditions: 342,
+    totalValue: 125430,
+    totalItems: 38420,
+  },
 
-  inventoryDistribution: [
-    { name: 'Electronics', value: 35, color: '#ef4444' },
-    { name: 'Furniture', value: 20, color: '#f97316' },
-    { name: 'Apparel', value: 18, color: '#eab308' },
-    { name: 'Food', value: 15, color: '#22c55e' },
-    { name: 'Medical', value: 7, color: '#06b6d4' },
-    { name: 'Others', value: 5, color: '#8b5cf6' },
-  ],
-
-  locationPerformance: [
-    { name: 'Warehouse A', accuracy: 99.2, efficiency: 94 },
-    { name: 'Warehouse B', accuracy: 98.8, efficiency: 92 },
-    { name: 'Warehouse C', accuracy: 99.5, efficiency: 96 },
-    { name: 'Store A', accuracy: 98.5, efficiency: 88 },
-    { name: 'Store B', accuracy: 98.2, efficiency: 85 },
-    { name: 'Cold Storage', accuracy: 99.1, efficiency: 91 },
-  ],
-
-  discrepancyTrend: [
-    { date: 'Week 1', resolved: 20, pending: 4 },
-    { date: 'Week 2', resolved: 24, pending: 4 },
-    { date: 'Week 3', resolved: 20, pending: 2 },
-    { date: 'Week 4', resolved: 17, pending: 1 },
-    { date: 'Week 5', resolved: 14, pending: 1 },
-    { date: 'Week 6', resolved: 12, pending: 0 },
-  ],
-
-  recentStocktakes: [
-    { id: 'ST-2024-001', name: 'Year-End Physical Count', date: '2024-12-15', status: 'completed', accuracy: 99.3, location: 'Main Warehouse' },
-    { id: 'ST-2024-002', name: 'Zone A - Electronics', date: '2024-12-10', status: 'completed', accuracy: 99.33, location: 'Zone A' },
-    { id: 'ST-2024-003', name: 'Cycle Count - High Value', date: '2024-12-05', status: 'completed', accuracy: 99.62, location: 'Vault' },
-    { id: 'ST-2024-006', name: 'Rapid Cycle - Fast Movers', date: '2024-12-18', status: 'in_progress', accuracy: 99.45, location: 'Picking Zone' },
-  ],
-
-  topLocations: [
-    { name: 'Warehouse C', accuracy: 99.5, trend: '+2.3%' },
-    { name: 'Warehouse A', accuracy: 99.2, trend: '+1.8%' },
-    { name: 'Cold Storage', accuracy: 99.1, trend: '+1.2%' },
-    { name: 'Warehouse B', accuracy: 98.8, trend: '+0.9%' },
-    { name: 'Store A', accuracy: 98.5, trend: '+0.5%' },
-  ],
-
-  alerts: [
-    { id: 1, title: 'Low Stock Alert', message: 'Product A below reorder point', priority: 'high', time: '10 min ago' },
-    { id: 2, title: 'Batch Expiry Warning', message: 'BATCH-005 expires in 10 days', priority: 'medium', time: '1 hour ago' },
-    { id: 3, title: 'Sync Failed', message: 'ERP connection timeout', priority: 'critical', time: '2 hours ago' },
-    { id: 4, title: 'Device Offline', message: 'RFID Scanner #RF-1042 offline', priority: 'medium', time: '3 hours ago' },
-  ],
-
-  events: {
-    live: [
-      { id: "evt-001", uniqueId: "EVT-2024-001", name: "Annual Inventory Count 2024", status: "live", datetime: "2024-03-25T09:00:00Z", customerName: "Apple Singapore", storeName: "Orchard Road Store", location: "Singapore", totalUsers: 12, progress: 50 },
-      { id: "evt-002", uniqueId: "EVT-2024-002", name: "Electronics Quarterly Audit", status: "live", datetime: "2024-03-20T10:00:00Z", customerName: "Samsung Electronics", storeName: "Jurong East Store", location: "Singapore", totalUsers: 8, progress: 51 },
-      { id: "evt-003", uniqueId: "EVT-2024-003", name: "Clothing Store Inventory", status: "live", datetime: "2024-03-22T11:30:00Z", customerName: "Zara Retail", storeName: "VivoCity Store", location: "Singapore", totalUsers: 6, progress: 100 },
+  teamCollaboration: {
+    teamMembers: [
+      { id: 1, name: 'John Smith', role: 'Team Lead', status: 'online', avatar: 'JS', department: 'Operations', tasks: 5 },
+      { id: 2, name: 'Sarah Johnson', role: 'Senior Auditor', status: 'online', avatar: 'SJ', department: 'Audit', tasks: 3 },
+      { id: 3, name: 'Mike Chen', role: 'Inventory Specialist', status: 'away', avatar: 'MC', department: 'Inventory', tasks: 7 },
+      { id: 4, name: 'Lisa Wong', role: 'Quality Manager', status: 'online', avatar: 'LW', department: 'Quality', tasks: 4 },
+      { id: 5, name: 'David Kumar', role: 'Scanner Operator', status: 'offline', avatar: 'DK', department: 'Operations', tasks: 2 },
+      { id: 6, name: 'Emma Davis', role: 'Data Analyst', status: 'online', avatar: 'ED', department: 'Analytics', tasks: 6 },
     ],
-    upcoming: [
-      { id: "evt-004", uniqueId: "EVT-2024-004", name: "Furniture Warehouse Audit", status: "upcoming", datetime: "2024-04-05T08:00:00Z", customerName: "IKEA Singapore", storeName: "Tampines Store", location: "Singapore", totalUsers: 10, progress: 0 },
-      { id: "evt-005", uniqueId: "EVT-2024-005", name: "Sports Equipment Stock Take", status: "upcoming", datetime: "2024-04-10T09:00:00Z", customerName: "Decathlon", storeName: "Sports Hub", location: "Singapore", totalUsers: 7, progress: 0 },
-      { id: "evt-006", uniqueId: "EVT-2024-006", name: "Grocery Store Count", status: "upcoming", datetime: "2024-04-15T10:00:00Z", customerName: "FairPrice", storeName: "Jurong Point", location: "Singapore", totalUsers: 15, progress: 0 },
+    recentActivity: [
+      { id: 1, user: 'John Smith', action: 'completed inventory count for Section A', time: '5 min ago', event: 'Annual Inventory' },
+      { id: 2, user: 'Sarah Johnson', action: 'reviewed discrepancies in Electronics', time: '15 min ago', event: 'Electronics Audit' },
+      { id: 3, user: 'Mike Chen', action: 'uploaded scanner data', time: '1 hour ago', event: 'Warehouse Count' },
+      { id: 4, user: 'Lisa Wong', action: 'approved stock adjustments', time: '2 hours ago', event: 'Clothing Inventory' },
+      { id: 5, user: 'Emma Davis', action: 'generated accuracy report', time: '3 hours ago', event: 'Monthly Report' },
     ],
-    completed: [
-      { id: "evt-009", uniqueId: "EVT-2023-001", name: "Year-End Inventory 2023", status: "completed", datetime: "2023-12-15T09:00:00Z", customerName: "Apple Singapore", storeName: "Orchard Road Store", location: "Singapore", totalUsers: 12, progress: 100 },
-      { id: "evt-010", uniqueId: "EVT-2023-002", name: "Quarterly Electronics Review", status: "completed", datetime: "2023-11-10T10:00:00Z", customerName: "Samsung Electronics", storeName: "Jurong East Store", location: "Singapore", totalUsers: 8, progress: 100 },
+    pendingTasks: [
+      { id: 1, title: 'Verify Section A counts', assignee: 'John Smith', priority: 'high', dueDate: '2024-04-05' },
+      { id: 2, title: 'Review scanner calibration', assignee: 'Mike Chen', priority: 'medium', dueDate: '2024-04-06' },
+      { id: 3, title: 'Update inventory database', assignee: 'Emma Davis', priority: 'high', dueDate: '2024-04-04' },
+      { id: 4, title: 'Prepare audit report', assignee: 'Sarah Johnson', priority: 'low', dueDate: '2024-04-07' },
+    ],
+    teamStats: {
+      totalTasks: 27,
+      completedToday: 12,
+      pendingReviews: 6,
+      accuracy: 98.5,
+    }
+  },
+
+  teamChat: {
+    activeChats: [
+      {
+        id: 1,
+        name: 'Annual Inventory Count',
+        eventId: 'evt-001',
+        lastMessage: 'John: Just completed section A',
+        time: '5 min ago',
+        unread: 3,
+        participants: ['John Smith', 'Sarah Johnson', 'Mike Chen', 'Lisa Wong'],
+        messages: [
+          { id: 1, user: 'John Smith', message: 'Just completed section A', time: '10:30 AM', avatar: 'JS' },
+          { id: 2, user: 'Sarah Johnson', message: 'Great! Section B is 50% done', time: '10:35 AM', avatar: 'SJ' },
+          { id: 3, user: 'Mike Chen', message: 'Found some discrepancies in row 5', time: '10:42 AM', avatar: 'MC' },
+          { id: 4, user: 'Lisa Wong', message: "I'll review those discrepancies", time: '10:45 AM', avatar: 'LW' },
+        ]
+      },
+      {
+        id: 2,
+        name: 'Electronics Quarterly Audit',
+        eventId: 'evt-002',
+        lastMessage: 'Sarah: Need assistance with scanners',
+        time: '15 min ago',
+        unread: 5,
+        participants: ['Sarah Johnson', 'Mike Chen', 'John Smith'],
+        messages: [
+          { id: 1, user: 'Sarah Johnson', message: 'Need assistance with scanners', time: '11:00 AM', avatar: 'SJ' },
+          { id: 2, user: 'Mike Chen', message: "I'll help you with that", time: '11:05 AM', avatar: 'MC' },
+        ]
+      },
+      {
+        id: 3,
+        name: 'Clothing Store Inventory',
+        eventId: 'evt-003',
+        lastMessage: 'Lisa: All counts verified',
+        time: '1 hour ago',
+        unread: 0,
+        participants: ['Lisa Wong', 'John Smith'],
+        messages: [
+          { id: 1, user: 'Lisa Wong', message: 'All counts verified', time: '9:00 AM', avatar: 'LW' },
+        ]
+      },
     ],
   },
+
+  upcomingEventsOnly: [
+    { id: "evt-004", uniqueId: "EVT-2024-004", name: "Furniture Warehouse Annual Mega Audit 2026", status: "upcoming", startDate: "2026-04-05T08:00:00Z", customerName: "IKEA Singapore", storeName: "Tampines Store", location: "Singapore", totalUsers: 10, progress: 0 },
+    { id: "evt-005", uniqueId: "EVT-2024-005", name: "Sports Equipment Stock Take", status: "upcoming", startDate: "2026-04-12T09:00:00Z", customerName: "Decathlon", storeName: "Sports Hub", location: "Singapore", totalUsers: 7, progress: 0 },
+    { id: "evt-006", uniqueId: "EVT-2024-006", name: "Grocery Store Comprehensive Count", status: "upcoming", startDate: "2026-03-30T10:00:00Z", customerName: "FairPrice", storeName: "Jurong Point", location: "Singapore", totalUsers: 15, progress: 0 },
+    { id: "evt-007", uniqueId: "EVT-2024-007", name: "Pharmacy Inventory Check", status: "upcoming", startDate: "2024-04-18T09:00:00Z", customerName: "Guardian", storeName: "Raffles City", location: "Singapore", totalUsers: 5, progress: 0 },
+    { id: "evt-008", uniqueId: "EVT-2024-008", name: "Electronics Mega Stocktake", status: "upcoming", startDate: "2024-04-22T08:00:00Z", customerName: "Best Denki", storeName: "VivoCity", location: "Singapore", totalUsers: 12, progress: 0 },
+    { id: "evt-009", uniqueId: "EVT-2024-009", name: "Warehouse Monthly Audit", status: "upcoming", startDate: "2024-04-25T08:30:00Z", customerName: "Ninja Van", storeName: "Changi Warehouse", location: "Singapore", totalUsers: 20, progress: 0 },
+    { id: "evt-010", uniqueId: "EVT-2024-010", name: "Retail Store Inventory", status: "upcoming", startDate: "2024-05-02T09:00:00Z", customerName: "Uniqlo", storeName: "Orchard Central", location: "Singapore", totalUsers: 12, progress: 0 },
+    { id: "evt-011", uniqueId: "EVT-2024-011", name: "Electronics Stock Check", status: "upcoming", startDate: "2024-05-10T10:00:00Z", customerName: "Challenger", storeName: "Funan Mall", location: "Singapore", totalUsers: 8, progress: 0 },
+  ],
+
+  activeStocktakeEvents: [
+    { id: "evt-001", uniqueId: "EVT-2024-001", name: "Annual Inventory Count 2024", status: "live", startDate: "2024-03-25T09:00:00Z", customerName: "Apple Singapore", storeName: "Orchard Road Store", location: "Singapore", totalUsers: 12, progress: 50 },
+    { id: "evt-002", uniqueId: "EVT-2024-002", name: "Electronics Quarterly Audit", status: "live", startDate: "2024-03-20T10:00:00Z", customerName: "Samsung Electronics", storeName: "Jurong East Store", location: "Singapore", totalUsers: 8, progress: 51 },
+    { id: "evt-003", uniqueId: "EVT-2024-003", name: "Clothing Store Inventory", status: "live", startDate: "2024-03-22T11:30:00Z", customerName: "Zara Retail", storeName: "VivoCity Store", location: "Singapore", totalUsers: 6, progress: 100 },
+  ],
 
   bottomStats: [
     { icon: Scan, label: "Today's Counts", value: "2,450", color: "text-red-600", bgColor: "bg-red-50" },
@@ -224,11 +263,65 @@ const DashboardPage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [expandedEventTypes, setExpandedEventTypes] = useState({
-    live: true,
-    upcoming: false,
-    completed: false,
-  });
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  
+  // Calendar state
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  // Filter upcoming events (only future events)
+  const getFilteredUpcomingEvents = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return MOCK_DATA.upcomingEventsOnly
+      .filter(event => {
+        const eventDate = new Date(event.startDate);
+        return eventDate >= today;
+      })
+      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  };
+
+  // Get events for the current month
+  const getEventsForMonth = (date) => {
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    return getFilteredUpcomingEvents().filter(event => {
+      const eventDate = new Date(event.startDate);
+      return eventDate >= startOfMonth && eventDate <= endOfMonth;
+    });
+  };
+
+  // Get days in month with events
+  const getDaysWithEvents = () => {
+    const eventsInMonth = getEventsForMonth(currentMonth);
+    const daysMap = {};
+    
+    eventsInMonth.forEach(event => {
+      const day = new Date(event.startDate).getDate();
+      daysMap[day] = daysMap[day] || [];
+      daysMap[day].push(event);
+    });
+    
+    return daysMap;
+  };
+
+  const daysWithEvents = getDaysWithEvents();
+  const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+  
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+  
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
 
   const getStatusBadge = (status) => {
     const config = {
@@ -257,810 +350,763 @@ const DashboardPage = () => {
     }, 1500);
   };
 
-  const handleEventClick = (event) => {
+  const handleGoToEvent = (event) => {
     if (event.status === 'live') {
       router.push(`/dashboard/live/event-dashboard/${event.id}`);
+    } else {
+      router.push(`/dashboard/events/${event.id}/setup`);
     }
   };
 
-  const toggleEventType = (type) => {
-    setExpandedEventTypes(prev => ({ ...prev, [type]: !prev[type] }));
+  const handleOpenChat = (event) => {
+    const chat = MOCK_DATA.teamChat.activeChats.find(c => c.eventId === event.id);
+    if (chat) {
+      setSelectedChat(chat);
+      setIsChatDialogOpen(true);
+    }
+  };
+  
+  const handleOpenTeamChat = (member) => {
+    const mockChat = {
+      id: `chat-${member.id}`,
+      name: `Chat with ${member.name}`,
+      participants: [member.name, 'You'],
+      messages: [
+        { id: 1, user: member.name, message: `Hi! How can I help you with the inventory tasks?`, time: 'Just now', avatar: member.avatar }
+      ]
+    };
+    setSelectedChat(mockChat);
+    setIsChatDialogOpen(true);
   };
 
-  // Filter events
-  const getFilteredEvents = (events) => {
-    return events.filter(event => {
-      const matchesSearch = searchQuery === "" ||
-        event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.storeName.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesStatus = statusFilter === "all" || event.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
+  const handleSetupNewStocktake = () => {
+    router.push('/dashboard/events/new');
   };
 
-  const filteredLiveEvents = getFilteredEvents(MOCK_DATA.events.live);
-  const filteredUpcomingEvents = getFilteredEvents(MOCK_DATA.events.upcoming);
-  const filteredCompletedEvents = getFilteredEvents(MOCK_DATA.events.completed);
+  const handleSendMessage = () => {
+    if (newMessage.trim() && selectedChat) {
+      console.log(`Sending message to ${selectedChat.name}: ${newMessage}`);
+      setNewMessage("");
+    }
+  };
 
-  const eventCategories = [
-    { id: 'live', title: 'Live Events', icon: PlayCircle, color: 'text-green-600', bgColor: 'bg-green-100', count: filteredLiveEvents.length, events: filteredLiveEvents, totalUsers: filteredLiveEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
-    { id: 'upcoming', title: 'Upcoming Events', icon: CalendarClock, color: 'text-blue-600', bgColor: 'bg-blue-100', count: filteredUpcomingEvents.length, events: filteredUpcomingEvents, totalUsers: filteredUpcomingEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
-    { id: 'completed', title: 'Completed Events', icon: CheckCircle, color: 'text-gray-600', bgColor: 'bg-gray-100', count: filteredCompletedEvents.length, events: filteredCompletedEvents, totalUsers: filteredCompletedEvents.reduce((sum, e) => sum + e.totalUsers, 0) },
-  ];
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const upcomingEvents = getFilteredUpcomingEvents();
+  const currentMonthEvents = getEventsForMonth(currentMonth);
+  const onlineMembers = MOCK_DATA.teamCollaboration.teamMembers.filter(m => m.status === 'online').length;
+
+  const truncateText = (text, maxLength = 40) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 rounded-md">
-      {/* Header */}
-      <div className=" z-10  border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Welcome back! Here's what's happening with your inventory today.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[140px] shadow-md">
-                  <SelectValue placeholder="Date Range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="week">This Week</SelectItem>
-                  <SelectItem value="month">This Month</SelectItem>
-                  <SelectItem value="quarter">This Quarter</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedWarehouse} onValueChange={setSelectedWarehouse} >
-                <SelectTrigger className="w-[150px] shadow-md">
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="wh-a">Warehouse A</SelectItem>
-                  <SelectItem value="wh-b">Warehouse B</SelectItem>
-                  <SelectItem value="wh-c">Warehouse C</SelectItem>
-                </SelectContent>
-              </Select>
+    <TooltipProvider>
+      <div className="min-h-screen bg-gray-50 rounded-md">
+        {/* Header */}
+        <div className="z-10 border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-gray-500 text-sm mt-1">
+                Welcome back! Here's what's happening with your inventory today.
+              </p>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md"
-            >
-              <RefreshCw size={18} className={cn(refreshing && "animate-spin")} />
-            </Button>
-            <Button className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md">
-              <Download size={16} className="mr-2" />
-              Export Report
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        {/* KPI Cards Row 1 - Inventory Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-green-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Total Inventory Value</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">${MOCK_DATA.kpis.totalInventoryValue.toLocaleString()}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.inventoryValueChange}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <DollarSign size={120} className="text-red-600" />
-    </div> */}
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-blue-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Total Items Counted</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.kpis.totalItems.toLocaleString()}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.itemsChange}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <Package size={120} className="text-blue-600" />
-    </div> */}
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative  bg-gradient-to-br from-purple-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Stocktake Accuracy</p>
-                  <p className="text-2xl font-bold text-green-600 mt-1">{MOCK_DATA.kpis.stocktakeAccuracy}%</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.accuracyChange}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <Target size={120} className="text-green-600" />
-    </div> */}
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-orange-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Pending Discrepancies</p>
-                  <p className="text-2xl font-bold text-orange-600 mt-1">{MOCK_DATA.kpis.pendingDiscrepancies}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingDown size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.discrepanciesChange}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <AlertTriangle size={120} className="text-orange-600" />
-    </div> */}
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-green-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Active Stocktakes</p>
-                  <p className="text-2xl font-bold text-blue-600 mt-1">{MOCK_DATA.kpis.activeStocktakes}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.stocktakesChange}</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <ClipboardList size={120} className="text-purple-600" />
-    </div> */}
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all overflow-hidden relative bg-gradient-to-br from-blue-50 to-white">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500">Total Stocktakes</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.kpis.totalStocktakes}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <TrendingUp size={12} className="text-green-600" />
-                    <span className="text-xs text-green-600">{MOCK_DATA.kpis.stocktakesGrowth}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            {/* <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10">
-      <Activity size={120} className="text-teal-600" />
-    </div> */}
-          </Card>
-        </div>
-
-        {/* KPI Cards Row 2 - Event Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-green-50 to-white">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Current Events</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.currentEvents}</p>
-                </div>
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <PlayCircle size={24} className="text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-blue-50 to-white">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Upcoming Events</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.upcomingEvents}</p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <CalendarClock size={24} className="text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-purple-50 to-white">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Completed Events</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.completedEvents}</p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <CheckSquare size={24} className="text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200 hover:shadow-md transition-all bg-gradient-to-br from-orange-50 to-white">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-gray-500">Total Scanned</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{MOCK_DATA.eventStats.totalScanned.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-orange-100 rounded-xl">
-                  <Scan size={24} className="text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions Section - Single Horizontal Bar */}
-        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl border border-gray-200 p-3 shadow-md">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Zap size={20} className="text-blue-600" />
-              <span className="text-sm font-semibold text-gray-900">Quick Actions:</span>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
-                <Calendar size={16} className="text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">Schedule Event</span>
-              </Button>
-
-              <div className="w-px h-6 bg-gray-300"></div>
-
-              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
-                <Settings size={16} className="text-purple-600" />
-                <span className="text-sm font-medium text-gray-700">Setup</span>
-              </Button>
-
-              <div className="w-px h-6 bg-gray-300"></div>
-
-              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
-                <PlayCircle size={16} className="text-green-600" />
-                <span className="text-sm font-medium text-gray-700">Go Live</span>
-              </Button>
-
-              <div className="w-px h-6 bg-gray-300"></div>
-
-              <Button variant="ghost" className="h-9 px-3 hover:bg-white/50 rounded-lg gap-2 cursor-pointer">
-                <FileText size={16} className="text-orange-600" />
-                <span className="text-sm font-medium text-gray-700">Tutorial</span>
-              </Button>
-            </div>
-
-            <Button className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md cursor-pointer">
-              Notifications
-              <Bell size={14} className="ml-2" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Inventory Trend Chart */}
-          <Card className="border-gray-200 lg:col-span-2">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Inventory Trend</CardTitle>
-                  <CardDescription>Items counted and accuracy over time</CardDescription>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical size={16} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View Details</DropdownMenuItem>
-                    <DropdownMenuItem>Export Data</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart data={MOCK_DATA.inventoryTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" stroke="#9ca3af" />
-                  <YAxis yAxisId="left" stroke="#9ca3af" />
-                  <YAxis yAxisId="right" orientation="right" stroke="#ef4444" />
-                  <ReTooltip />
-                  <Legend />
-                  <Area yAxisId="left" type="monotone" dataKey="count" fill="#fee2e2" stroke="#ef4444" name="Items Counted" />
-                  <Line yAxisId="right" type="monotone" dataKey="accuracy" stroke="#22c55e" name="Accuracy %" strokeWidth={2} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Inventory Distribution */}
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Inventory Distribution</CardTitle>
-              <CardDescription>By category</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={280}>
-                <RePieChart>
-                  <Pie
-                    data={MOCK_DATA.inventoryDistribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {MOCK_DATA.inventoryDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ReTooltip />
-                </RePieChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap justify-center gap-3 mt-2">
-                {MOCK_DATA.inventoryDistribution.map((item) => (
-                  <div key={item.name} className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-xs text-gray-600">{item.name}</span>
-                    <span className="text-xs font-medium text-gray-900">{item.value}%</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Performance Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Stocktake Performance</CardTitle>
-              <CardDescription>Monthly completed stocktakes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={MOCK_DATA.stocktakePerformance}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <ReTooltip />
-                  <Bar dataKey="completed" fill="#ef4444" radius={[4, 4, 0, 0]} name="Completed Stocktakes" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Accuracy Trend</CardTitle>
-              <CardDescription>Stocktake accuracy over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <ReLineChart data={MOCK_DATA.stocktakePerformance}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#9ca3af" />
-                  <YAxis domain={[95, 100]} stroke="#9ca3af" />
-                  <ReTooltip />
-                  <Line type="monotone" dataKey="accuracy" stroke="#22c55e" strokeWidth={2} dot={{ fill: '#22c55e', r: 4 }} name="Accuracy %" />
-                </ReLineChart>
-              </ResponsiveContainer>
-              <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-green-700">Current Accuracy</span>
-                  <span className="text-2xl font-bold text-green-700">99.2%</span>
-                </div>
-                <Progress value={99.2} className="h-2 mt-2 bg-green-200" />
-                <p className="text-xs text-green-600 mt-2">↑ 1.8% improvement from last quarter</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Discrepancy Resolution</CardTitle>
-              <CardDescription>Weekly resolution trends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={MOCK_DATA.discrepancyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <ReTooltip />
-                  <Bar dataKey="resolved" fill="#22c55e" name="Resolved" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="pending" fill="#eab308" name="Pending" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Location Performance & Recent Stocktakes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Location Performance</CardTitle>
-              <CardDescription>Accuracy and efficiency by location</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={MOCK_DATA.locationPerformance} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis type="number" domain={[80, 100]} stroke="#9ca3af" />
-                  <YAxis type="category" dataKey="name" stroke="#9ca3af" width={100} />
-                  <ReTooltip />
-                  <Legend />
-                  <Bar dataKey="accuracy" fill="#ef4444" name="Accuracy %" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="efficiency" fill="#22c55e" name="Efficiency %" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Recent Stocktakes</CardTitle>
-                  <CardDescription>Latest inventory counts</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" className="text-red-600">
-                  View All
-                  <ChevronRight size={16} className="ml-1" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {MOCK_DATA.recentStocktakes.map((stocktake) => (
-                  <div key={stocktake.id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2 rounded-full",
-                        stocktake.status === 'completed' ? "bg-green-100" : "bg-blue-100"
-                      )}>
-                        {stocktake.status === 'completed' ? (
-                          <CheckCircle size={16} className="text-green-600" />
-                        ) : (
-                          <RefreshCw size={16} className="text-blue-600" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm text-gray-900">{stocktake.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">{stocktake.date}</span>
-                          <span className="text-xs text-gray-500">•</span>
-                          <span className="text-xs text-gray-500">{stocktake.location}</span>
-                          <span className="text-xs font-medium text-green-600">{stocktake.accuracy}%</span>
-                        </div>
-                      </div>
-                    </div>
-                    {getStatusBadge(stocktake.status)}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Events Management Section */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-              <div>
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  <ClipboardCheck className="h-6 w-6 text-red-600" />
-                  Events Management
-                </CardTitle>
-                <CardDescription className="mt-1">
-                  Click on any live event to view stock take actions
-                </CardDescription>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                <div className="relative flex-1 sm:flex-none sm:w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search events..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Filter by status" />
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-[140px] shadow-md">
+                    <SelectValue placeholder="Date Range" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Events</SelectItem>
-                    <SelectItem value="live">Live Events</SelectItem>
-                    <SelectItem value="upcoming">Upcoming Events</SelectItem>
-                    <SelectItem value="completed">Completed Events</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">This Week</SelectItem>
+                    <SelectItem value="month">This Month</SelectItem>
+                    <SelectItem value="quarter">This Quarter</SelectItem>
+                    <SelectItem value="year">This Year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={selectedWarehouse} onValueChange={setSelectedWarehouse}>
+                  <SelectTrigger className="w-[150px] shadow-md">
+                    <SelectValue placeholder="All Locations" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    <SelectItem value="wh-a">Warehouse A</SelectItem>
+                    <SelectItem value="wh-b">Warehouse B</SelectItem>
+                    <SelectItem value="wh-c">Warehouse C</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md"
+              >
+                <RefreshCw size={18} className={cn(refreshing && "animate-spin")} />
+              </Button>
+              <Button className="bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md">
+                <Download size={16} className="mr-2" />
+                Export Report
+              </Button>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="space-y-4">
-              {eventCategories.map((category) => (
-                <div key={category.id} className="border-b border-gray-100 last:border-0">
-                  {/* Category Header */}
-                  <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                    onClick={() => toggleEventType(category.id)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        {expandedEventTypes[category.id] ? (
-                          <ChevronDown size={18} />
-                        ) : (
-                          <ChevronRight size={18} />
-                        )}
-                      </Button>
-                      <div className={cn("p-2 rounded-lg", category.bgColor)}>
-                        <category.icon className={cn("h-5 w-5", category.color)} />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{category.title}</h3>
-                        <p className="text-sm text-gray-500">
-                          {category.id === "live" ? "Currently active events" :
-                            category.id === "upcoming" ? "Scheduled future events" :
-                              "Completed events"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-gray-900">{category.count}</div>
-                        <div className="text-xs text-gray-500">events</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-gray-900">{category.totalUsers}</div>
-                        <div className="text-xs text-gray-500">users</div>
-                      </div>
-                    </div>
-                  </div>
+          </div>
+        </div>
 
-                  {/* Expanded Content */}
-                  {expandedEventTypes[category.id] && (
-                    <div className="px-4 pb-4">
-                      {category.events.length > 0 ? (
-                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="bg-gray-50">
-                                <TableHead className="font-medium">Event ID</TableHead>
-                                <TableHead className="font-medium">Event Name</TableHead>
-                                <TableHead className="font-medium">Date & Time</TableHead>
-                                <TableHead className="font-medium">Customer</TableHead>
-                                <TableHead className="font-medium">Store</TableHead>
-                                <TableHead className="font-medium">Status</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {category.events.map((event) => (
-                                <TableRow
-                                  key={event.id}
-                                  className={cn(
-                                    "transition-colors",
-                                    event.status === 'live' && "cursor-pointer hover:bg-green-50"
-                                  )}
-                                  onClick={() => handleEventClick(event)}
-                                >
-                                  <TableCell>
-                                    <span className="font-mono text-sm">{event.uniqueId}</span>
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="font-medium text-gray-900">{event.name}</div>
-                                    {event.status === 'live' && (
-                                      <div className="text-xs text-green-600 mt-1">Click to open actions</div>
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="text-sm text-gray-900">
-                                      {new Date(event.datetime).toLocaleDateString()}
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                      {new Date(event.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center gap-2">
-                                      <Building className="h-4 w-4 text-gray-400" />
-                                      <span className="text-sm text-gray-900">{event.customerName}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center gap-2">
-                                      <Store className="h-4 w-4 text-gray-400" />
-                                      <span className="text-sm text-gray-900">{event.storeName}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>{getStatusBadge(event.status)}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
-                          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <h4 className="font-semibold text-gray-900 mb-2">No Events Found</h4>
-                          <p className="text-gray-600 text-sm">No events match your current search criteria.</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-          <CardFooter className="border-t border-gray-200 p-4">
-            <div className="text-sm text-gray-600">
-              Showing {eventCategories.reduce((sum, cat) => sum + cat.count, 0)} events across {eventCategories.length} categories
-            </div>
-          </CardFooter>
-        </Card>
-
-        {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Top Performing Locations */}
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Top Performing Locations</CardTitle>
-              <CardDescription>Highest accuracy rates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {MOCK_DATA.topLocations.map((location, idx) => (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
-                        <Award size={14} className="text-red-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm text-gray-900">{location.name}</p>
-                        <p className="text-xs text-gray-500 mt-1">Accuracy: {location.accuracy}%</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 border-0">{location.trend}</Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Active Alerts */}
-          <Card className="border-gray-200">
+        <div className="p-6 space-y-6">
+          {/* Event Wallet Section */}
+          <Card className="border-gray-200 overflow-hidden bg-gradient-to-br from-blue-50/50 to-white">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Active Alerts</CardTitle>
-                  <CardDescription>Requires attention</CardDescription>
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-blue-100 rounded-lg">
+                    <Wallet className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-base font-semibold">Event Wallet</CardTitle>
                 </div>
-                <Button variant="ghost" size="sm" className="text-red-600">
-                  View All
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                  {MOCK_DATA.eventWallet.remainingCredits} Credits Remaining
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                  <p className="text-xs text-gray-500 mb-1">Total Credits</p>
+                  <p className="text-xl font-bold text-gray-900">{MOCK_DATA.eventWallet.totalCredits}</p>
+                  <Progress value={(MOCK_DATA.eventWallet.usedCredits / MOCK_DATA.eventWallet.totalCredits) * 100} className="h-1 mt-1 bg-gray-100" />
+                  <p className="text-xs text-gray-500 mt-1">{MOCK_DATA.eventWallet.usedCredits} used</p>
+                </div>
+                <div className="bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                  <p className="text-xs text-gray-500 mb-1">Used Credits</p>
+                  <p className="text-xl font-bold text-gray-900">{MOCK_DATA.eventWallet.usedCredits}</p>
+                  <p className="text-xs text-amber-600 mt-1">62.5% utilization</p>
+                </div>
+                <div className="bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                  <p className="text-xs text-gray-500 mb-1">Remaining Credits</p>
+                  <p className="text-xl font-bold text-green-600">{MOCK_DATA.eventWallet.remainingCredits}</p>
+                  <p className="text-xs text-green-600 mt-1">Available for new events</p>
+                </div>
+              </div>
+
+              <div className="mt-3 space-y-1">
+                <p className="text-xs font-medium text-gray-700 mb-1">Active Subscriptions</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  {MOCK_DATA.eventWallet.subscriptions.map((sub) => (
+                    <div key={sub.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg border border-gray-100">
+                      <div>
+                        <p className="font-medium text-gray-900 text-xs">{sub.name}</p>
+                        <p className="text-xs text-gray-500">Expires: {new Date(sub.expiryDate).toLocaleDateString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-gray-900">{sub.usedEvents}/{sub.totalEvents}</p>
+                        <p className="text-xs text-gray-500">events</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Main Content Area - Fixed Heights */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Side: Active Stocktake Events Table - Fixed Height */}
+            <div className="lg:col-span-2">
+              <Card className="border-gray-200 h-[532px] flex flex-col bg-gradient-to-br from-blue-50/50 to-white">
+                <CardHeader className="pb-2 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base font-semibold flex items-center gap-2">
+                        <PlayCircle className="h-4 w-4 text-green-600" />
+                        Active Stocktake Events
+                      </CardTitle>
+                      <CardDescription className="text-xs">Currently live stock counting events</CardDescription>
+                    </div>
+                    <Badge className="bg-green-100 text-green-700 border-0 text-xs">
+                      {MOCK_DATA.activeStocktakeEvents.length} Active
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 pt-0 overflow-hidden">
+                  {MOCK_DATA.activeStocktakeEvents.length > 0 ? (
+                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden h-full flex flex-col">
+                      <div className="flex-1 overflow-y-auto">
+                        <Table>
+                          <TableHeader className="sticky top-0 bg-gray-50">
+                            <TableRow className="bg-gray-50">
+                              <TableHead className="font-medium text-xs py-2">Event Name</TableHead>
+                              <TableHead className="font-medium text-xs py-2">Status</TableHead>
+                              <TableHead className="font-medium text-xs py-2">Start Date</TableHead>
+                              <TableHead className="font-medium text-xs py-2 text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {MOCK_DATA.activeStocktakeEvents.map((event) => (
+                              <TableRow key={event.id} className="hover:bg-gray-50 transition-colors">
+                                <TableCell className="py-2">
+                                  <div className="font-medium text-gray-900 text-sm">{event.name}</div>
+                                  <div className="text-xs text-gray-500 mt-0.5">{event.customerName} • {event.storeName}</div>
+                                </TableCell>
+                                <TableCell className="py-2">{getStatusBadge(event.status)}</TableCell>
+                                <TableCell className="py-2">
+                                  <div className="text-sm text-gray-900">{formatDate(event.startDate)}</div>
+                                  <div className="text-xs text-gray-500">
+                                    {new Date(event.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-2 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+                                      onClick={() => handleGoToEvent(event)}
+                                    >
+                                      <PlayCircle size={12} className="mr-1" />
+                                      Go
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2 text-purple-600 border-purple-200 hover:bg-purple-50 text-xs"
+                                      onClick={() => handleOpenChat(event)}
+                                    >
+                                      <MessageCircle size={12} className="mr-1" />
+                                      Chat
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+                      <h4 className="font-semibold text-gray-900 mb-1 text-sm">No Active Events</h4>
+                      <p className="text-gray-600 text-xs">There are currently no live stocktake events.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Side: Calendar and Upcoming Events - Fixed Height */}
+            <div className="lg:col-span-1">
+              {/* New Event Button */}
+              <div className="mb-4">
+                <Button
+                  className="w-full bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-0 text-black shadow-md"
+                  onClick={handleSetupNewStocktake}
+                >
+                  <PlusCircle size={16} className="mr-2" />
+                  Set Up New Stock Take
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {MOCK_DATA.alerts.map((alert) => (
-                  <div key={alert.id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                    <div className={cn(
-                      "p-1.5 rounded-full",
-                      alert.priority === 'critical' ? "bg-red-100" :
-                        alert.priority === 'high' ? "bg-orange-100" : "bg-yellow-100"
-                    )}>
-                      {alert.priority === 'critical' ? (
-                        <AlertCircleIcon size={12} className="text-red-600" />
-                      ) : (
-                        <AlertTriangle size={12} className="text-orange-600" />
-                      )}
+
+              {/* Calendar and Upcoming Events Combined Card - Fixed Height */}
+              <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white h-[480px] flex flex-col">
+                <CardHeader className="pb-2 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-blue-600" />
+                      Upcoming Events
+                    </CardTitle>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 hover:bg-blue-100"
+                        onClick={goToPreviousMonth}
+                      >
+                        <ChevronLeft size={14} />
+                      </Button>
+                      <span className="text-xs font-medium text-gray-700 min-w-[100px] text-center">
+                        {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 hover:bg-blue-100"
+                        onClick={goToNextMonth}
+                      >
+                        <ChevronRightIcon size={14} />
+                      </Button>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900">{alert.title}</p>
-                        <span className="text-xs text-gray-400">{alert.time}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 overflow-y-auto pt-0">
+                  {/* Week Days Header */}
+                  <div className="grid grid-cols-7 gap-0.5 mb-2">
+                    {weekDays.map(day => (
+                      <div key={day} className="text-center text-[10px] font-medium text-gray-500 py-1">
+                        {day}
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{alert.message}</p>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  
+                  {/* Calendar Days */}
+                  <div className="grid grid-cols-7 gap-0.5 mb-4">
+                    {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                      <div key={`empty-${i}`} className="aspect-square rounded-full" />
+                    ))}
+                    
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1;
+                      const hasEvents = daysWithEvents[day] && daysWithEvents[day].length > 0;
+                      const events = daysWithEvents[day] || [];
+                      
+                      return (
+                        <Tooltip key={day}>
+                          <TooltipTrigger asChild>
+                            <div className={cn(
+                              "aspect-square flex items-center justify-center text-xs rounded-full transition-all cursor-pointer",
+                              hasEvents 
+                                ? "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 font-semibold hover:from-blue-200 hover:to-blue-300 shadow-sm" 
+                                : "hover:bg-gray-100 text-gray-700"
+                            )}>
+                              {day}
+                            </div>
+                          </TooltipTrigger>
+                          {hasEvents && (
+                            <TooltipContent side="top" className="max-w-xs">
+                              <div className="space-y-1">
+                                <p className="text-xs font-semibold">{events.length} event(s)</p>
+                                {events.slice(0, 2).map(e => (
+                                  <p key={e.id} className="text-xs truncate">{e.name}</p>
+                                ))}
+                                {events.length > 2 && <p className="text-xs text-gray-500">+{events.length - 2} more</p>}
+                              </div>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
 
-          {/* Quick Insights */}
-          <Card className="border-gray-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold">Quick Insights</CardTitle>
-              <CardDescription>Key metrics at a glance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target size={14} className="text-red-600" />
-                      <span className="text-xs text-gray-500">Accuracy Goal</span>
+                  {/* Upcoming Events List */}
+                  <div className="border-t border-gray-200 pt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1.5">
+                        <CalendarClock className="h-3 w-3 text-blue-600" />
+                        Upcoming Events
+                      </h3>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs px-1.5">
+                        {upcomingEvents.length}
+                      </Badge>
                     </div>
-                    <p className="text-xl font-bold text-gray-900">99.5%</p>
-                    <Progress value={92} className="h-1.5 mt-2" />
-                    <p className="text-xs text-green-600 mt-1">0.3% to target</p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock size={14} className="text-blue-600" />
-                      <span className="text-xs text-gray-500">Avg. Stocktake Time</span>
-                    </div>
-                    <p className="text-xl font-bold text-gray-900">2.4 hrs</p>
-                    <p className="text-xs text-green-600 mt-1">↓ 15% faster</p>
-                  </div>
-                </div>
-                <div className="p-3 bg-gradient-to-r from-red-50 to-transparent rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">Next Scheduled Stocktake</span>
-                    <CalendarDays size={14} className="text-red-600" />
-                  </div>
-                  <p className="text-lg font-bold text-gray-900">December Cycle Count</p>
-                  <p className="text-xs text-gray-500 mt-1">Scheduled for Dec 20, 2024</p>
-                  <Button variant="link" className="p-0 h-auto mt-2 text-red-600">
-                    View Details
-                    <ChevronRight size={14} className="ml-1" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* Bottom Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {MOCK_DATA.bottomStats.map((stat, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all">
-              <div className={cn("p-2 rounded-lg", stat.bgColor)}>
-                <stat.icon size={20} className={stat.color} />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">{stat.label}</p>
-                <p className="text-lg font-bold text-gray-900">{stat.value}</p>
-              </div>
+                    {upcomingEvents.length > 0 ? (
+                      <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 upcoming-events-scroll">
+                        {upcomingEvents.map((event) => (
+                          <div key={event.id} className="p-2 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-all hover:border-blue-200">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 min-w-0">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <p className="font-medium text-gray-900 text-xs truncate cursor-help">
+                                      {truncateText(event.name, 35)}
+                                    </p>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs">
+                                    <p className="text-xs">{event.name}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 mt-0.5 cursor-help">
+                                      <Building size={10} className="text-gray-400 flex-shrink-0" />
+                                      <p className="text-xs text-gray-500 truncate">
+                                        {truncateText(`${event.customerName} • ${event.storeName}`, 40)}
+                                      </p>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs">
+                                    <p className="text-xs">{event.customerName} • {event.storeName}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 px-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs ml-2 flex-shrink-0"
+                                onClick={() => handleGoToEvent(event)}
+                              >
+                                <PlayCircle size={10} className="mr-0.5" />
+                                View
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 bg-white rounded-lg border border-gray-200">
+                        <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-1" />
+                        <p className="text-xs text-gray-500">No upcoming events</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          ))}
+          </div>
+
+          {/* Master Setup & Administration + Team Collaboration Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+             {/* Master Setup & Administration Card */}
+            <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white flex flex-col">
+              <CardHeader className="pb-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-purple-100 rounded-lg">
+                      <Settings className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <CardTitle className="text-base font-semibold">Master Setup & Administration</CardTitle>
+                  </div>
+                </div>
+                <CardDescription className="text-xs">Configure locations, teams, and inventory settings</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                  {/* Locations Card */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col hover:shadow-md transition-shadow">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-blue-100 rounded-lg">
+                            <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                          </div>
+                          <h3 className="font-semibold text-sm text-gray-900">Locations</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-2 mb-3">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Total Locations</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.locations.length}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Total Items</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.locations.reduce((sum, l) => sum + l.itemCount, 0).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Categories</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.locations.reduce((sum, l) => sum + (l.categories || 0), 0)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-blue-600 border-blue-200 hover:bg-blue-50 text-xs mt-auto"
+                      onClick={() => router.push('/dashboard/setup/locations')}
+                    >
+                      Manage Locations →
+                    </Button>
+                  </div>
+
+                  {/* Teams Card */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col hover:shadow-md transition-shadow">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-green-100 rounded-lg">
+                            <Users className="h-3.5 w-3.5 text-green-600" />
+                          </div>
+                          <h3 className="font-semibold text-sm text-gray-900">Teams</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-2 mb-3">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Total Members</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.teams.reduce((sum, t) => sum + t.members, 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Active Tasks</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.teams.reduce((sum, t) => sum + t.activeTasks, 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Completed Tasks</span>
+                          <span className="font-semibold text-green-600">{MOCK_DATA.teams.reduce((sum, t) => sum + (t.completedTasks || 0), 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Productivity Rate</span>
+                          <span className="font-semibold text-gray-900">87%</span>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100 pt-2 mb-2">
+                        <p className="text-xs font-medium text-gray-700 mb-1">Team Leads:</p>
+                        <div className="flex -space-x-2">
+                          {MOCK_DATA.teamCollaboration?.teamMembers?.slice(0, 3).map((member, idx) => (
+                            <div key={idx} className="relative">
+                              <Avatar className="h-6 w-6 border-2 border-white">
+                                <AvatarFallback className="text-[10px] bg-indigo-100 text-indigo-700">
+                                  {member.avatar}
+                                </AvatarFallback>
+                              </Avatar>
+                            </div>
+                          ))}
+                          {MOCK_DATA.teamCollaboration?.teamMembers?.length > 3 && (
+                            <div className="h-6 w-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center">
+                              <span className="text-[10px] font-medium text-gray-600">
+                                +{MOCK_DATA.teamCollaboration.teamMembers.length - 3}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-green-600 border-green-200 hover:bg-green-50 text-xs mt-auto"
+                      onClick={() => router.push('/dashboard/setup/teams')}
+                    >
+                      Manage Teams →
+                    </Button>
+                  </div>
+
+                  {/* Inventory Card */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-3 flex flex-col hover:shadow-md transition-shadow">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-orange-100 rounded-lg">
+                            <Package className="h-3.5 w-3.5 text-orange-600" />
+                          </div>
+                          <h3 className="font-semibold text-sm text-gray-900">Inventory</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-2 mb-3">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Categories</span>
+                          <span className="font-semibold text-gray-900">{MOCK_DATA.inventory.categories}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Total Stock Value</span>
+                          <span className="font-semibold text-gray-900">${MOCK_DATA.inventory.totalValue?.toLocaleString() || '125,430'}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Low Stock Alert</span>
+                          <span className="font-semibold text-red-600">{MOCK_DATA.inventory.lowStockItems}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-500">Out of Stock</span>
+                          <span className="font-semibold text-red-600">{MOCK_DATA.inventory.outOfStockItems || 3}</span>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100 pt-2 mb-2">
+                        <p className="text-xs font-medium text-gray-700 mb-1">Stock Status:</p>
+                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                          <div
+                            className="bg-green-500 h-1.5 rounded-full"
+                            style={{ width: `${((MOCK_DATA.inventory.totalItems - MOCK_DATA.inventory.lowStockItems) / MOCK_DATA.inventory.totalItems) * 100}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-[10px] text-gray-500 mt-1">
+                          <span>Healthy</span>
+                          <span>Low Stock</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-orange-600 border-orange-200 hover:bg-orange-50 text-xs mt-auto"
+                      onClick={() => router.push('/dashboard/setup/inventory')}
+                    >
+                      Manage Inventory →
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Team Collaboration Card - With Chat Buttons */}
+            <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white flex flex-col">
+              <CardHeader className="pb-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-indigo-100 rounded-lg">
+                      <Users2 className="h-4 w-4 text-indigo-600" />
+                    </div>
+                    <CardTitle className="text-base font-semibold">Team Collaboration</CardTitle>
+                  </div>
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                    {onlineMembers} Online Now
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">Stay connected with your team members</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 space-y-4">
+                {/* Team Members with Chat Buttons */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+                      <Users className="h-3 w-3 text-indigo-600" />
+                      Team Members
+                    </h3>
+                    <Button variant="link" size="sm" className="text-xs p-0 h-auto text-indigo-600">
+                      View All
+                    </Button>
+                  </div>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {MOCK_DATA.teamCollaboration.teamMembers.map((member) => (
+                      <div key={member.id} className="bg-white rounded-lg p-2 border border-gray-200 flex items-center justify-between hover:bg-gray-50 transition-colors group">
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="relative">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-xs bg-indigo-100 text-indigo-700">
+                                {member.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className={cn(
+                              "absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white",
+                              member.status === 'online' ? "bg-green-500" :
+                                member.status === 'away' ? "bg-yellow-500" : "bg-gray-400"
+                            )} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-gray-900">{member.name}</p>
+                            <p className="text-xs text-gray-500">{member.role}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Badge variant="outline" className="text-xs bg-gray-50 hidden sm:flex">
+                            {member.tasks} tasks
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                            onClick={() => handleOpenTeamChat(member)}
+                          >
+                            <MessageCircle size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
+        {/* Chat Dialog */}
+        <Dialog open={isChatDialogOpen} onOpenChange={setIsChatDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] h-[600px] flex flex-col p-0">
+            {selectedChat && (
+              <>
+                <DialogHeader className="p-4 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <DialogTitle className="text-lg font-semibold">{selectedChat.name}</DialogTitle>
+                      <DialogDescription className="text-xs">
+                        {selectedChat.participants.length} participants • Event Chat
+                      </DialogDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Phone size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Video size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setIsChatDialogOpen(false)}
+                      >
+                        <X size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                </DialogHeader>
+
+                {/* Messages Area */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {selectedChat.messages.map((message) => (
+                    <div key={message.id} className="flex items-start gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs bg-indigo-100 text-indigo-700">
+                          {message.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="font-medium text-sm text-gray-900">{message.user}</span>
+                          <span className="text-xs text-gray-400">{message.time}</span>
+                        </div>
+                        <p className="text-sm text-gray-700">{message.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Message Input */}
+                <div className="p-4 border-t bg-gray-50">
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Paperclip size={16} />
+                    </Button>
+                    <Input
+                      placeholder="Type your message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      className="flex-1 h-9 text-sm"
+                    />
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Smile size={16} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSendMessage}
+                      className="h-9 px-4 bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      <Send size={14} className="mr-1" />
+                      Send
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <style jsx global>{`
+          /* Custom scrollbar for upcoming events */
+          .upcoming-events-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+          }
+          .upcoming-events-scroll::-webkit-scrollbar {
+            width: 4px;
+          }
+          .upcoming-events-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+          }
+          .upcoming-events-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+          }
+          .upcoming-events-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+          }
+        `}</style>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
