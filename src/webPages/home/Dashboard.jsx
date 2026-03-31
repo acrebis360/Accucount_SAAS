@@ -61,6 +61,10 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
+  Smartphone,
+  Database,
+  Cloud,
+
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -73,12 +77,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -253,7 +251,34 @@ const MOCK_DATA = {
     { icon: Users, label: "Active Users", value: "24", color: "text-green-600", bgColor: "bg-green-50" },
     { icon: Boxes, label: "Low Stock Items", value: "12", color: "text-orange-600", bgColor: "bg-orange-50" },
     { icon: Calendar, label: "Upcoming Expiries", value: "45", color: "text-purple-600", bgColor: "bg-purple-50" },
-  ]
+  ],
+
+  // Mock data for Device Management
+  deviceManagement: {
+    totalDevices: 24,
+    activeDevices: 18,
+    offlineDevices: 6,
+    devicesByType: {
+      scanners: 12,
+      tablets: 8,
+      printers: 4,
+    },
+    recentScans: 1245,
+    syncStatus: "healthy",
+  },
+
+  // Mock data for Integration & Sync
+  integrationSync: {
+    activeIntegrations: 5,
+    pendingSyncs: 3,
+    lastSyncTime: "2024-03-27T10:30:00Z",
+    syncSuccess: 98.5,
+    integrations: [
+      { name: "ERP System", status: "connected", lastSync: "2 min ago" },
+      { name: "CRM Platform", status: "connected", lastSync: "5 min ago" },
+      { name: "Accounting Software", status: "syncing", lastSync: "1 min ago" },
+    ],
+  },
 };
 
 const DashboardPage = () => {
@@ -995,6 +1020,177 @@ const DashboardPage = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Device Management and Integration & Sync Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Device Management Card */}
+            <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-cyan-100 rounded-lg">
+                      <Smartphone className="h-4 w-4 text-cyan-600" />
+                    </div>
+                    <CardTitle className="text-base font-semibold">Device Management</CardTitle>
+                  </div>
+                  <Badge className={cn(
+                    "border-0 text-xs",
+                    MOCK_DATA.deviceManagement.syncStatus === "healthy" 
+                      ? "bg-green-100 text-green-700" 
+                      : "bg-yellow-100 text-yellow-700"
+                  )}>
+                    {MOCK_DATA.deviceManagement.syncStatus === "healthy" ? "All Systems Online" : "Sync Issues Detected"}
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">Monitor and manage your scanning devices</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <p className="text-xs text-gray-500 mb-1">Total Devices</p>
+                    <p className="text-xl font-bold text-gray-900">{MOCK_DATA.deviceManagement.totalDevices}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge className="bg-green-100 text-green-700 text-xs">Active: {MOCK_DATA.deviceManagement.activeDevices}</Badge>
+                      <Badge className="bg-gray-100 text-gray-700 text-xs">Offline: {MOCK_DATA.deviceManagement.offlineDevices}</Badge>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <p className="text-xs text-gray-500 mb-1">Recent Scans</p>
+                    <p className="text-xl font-bold text-gray-900">{MOCK_DATA.deviceManagement.recentScans.toLocaleString()}</p>
+                    <p className="text-xs text-green-600 mt-1">↑ 12.5% vs yesterday</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-gray-600">Device Types</span>
+                    <span className="font-medium text-gray-900">Distribution</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-600">Scanners</span>
+                        <span className="font-medium text-gray-900">{MOCK_DATA.deviceManagement.devicesByType.scanners}</span>
+                      </div>
+                      <Progress 
+                        value={(MOCK_DATA.deviceManagement.devicesByType.scanners / MOCK_DATA.deviceManagement.totalDevices) * 100} 
+                        className="h-1.5 bg-gray-100" 
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-600">Tablets</span>
+                        <span className="font-medium text-gray-900">{MOCK_DATA.deviceManagement.devicesByType.tablets}</span>
+                      </div>
+                      <Progress 
+                        value={(MOCK_DATA.deviceManagement.devicesByType.tablets / MOCK_DATA.deviceManagement.totalDevices) * 100} 
+                        className="h-1.5 bg-gray-100" 
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-600">Printers</span>
+                        <span className="font-medium text-gray-900">{MOCK_DATA.deviceManagement.devicesByType.printers}</span>
+                      </div>
+                      <Progress 
+                        value={(MOCK_DATA.deviceManagement.devicesByType.printers / MOCK_DATA.deviceManagement.totalDevices) * 100} 
+                        className="h-1.5 bg-gray-100" 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-cyan-600 border-cyan-200 hover:bg-cyan-50 text-xs"
+                    onClick={() => router.push('/dashboard/settings/devices')}
+                  >
+                    Manage Devices →
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Integration & Sync Card */}
+            <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-purple-100 rounded-lg">
+                      <Cloud className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <CardTitle className="text-base font-semibold">Integration & Sync</CardTitle>
+                  </div>
+                  <Badge className="bg-green-100 text-green-700 border-0 text-xs">
+                    <RefreshCw size={10} className="mr-1" />
+                    Auto-sync enabled
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs">Connect external systems and manage data synchronization</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <p className="text-xs text-gray-500 mb-1">Active Integrations</p>
+                    <p className="text-xl font-bold text-gray-900">{MOCK_DATA.integrationSync.activeIntegrations}</p>
+                    <p className="text-xs text-blue-600 mt-1">Connected to 3 systems</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <p className="text-xs text-gray-500 mb-1">Sync Success Rate</p>
+                    <p className="text-xl font-bold text-green-600">{MOCK_DATA.integrationSync.syncSuccess}%</p>
+                    <p className="text-xs text-gray-500 mt-1">Last sync: {new Date(MOCK_DATA.integrationSync.lastSyncTime).toLocaleTimeString()}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-gray-700 mb-1">Connected Systems</p>
+                  {MOCK_DATA.integrationSync.integrations.map((integration, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "h-2 w-2 rounded-full",
+                          integration.status === "connected" ? "bg-green-500" : 
+                          integration.status === "syncing" ? "bg-blue-500 animate-pulse" : "bg-red-500"
+                        )} />
+                        <span className="text-sm font-medium text-gray-900">{integration.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">{integration.lastSync}</span>
+                        <Badge variant="outline" className={cn(
+                          "text-xs",
+                          integration.status === "connected" ? "bg-green-50 text-green-700 border-green-200" :
+                          integration.status === "syncing" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-red-50 text-red-700 border-red-200"
+                        )}>
+                          {integration.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-200 flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 text-purple-600 border-purple-200 hover:bg-purple-50 text-xs"
+                    onClick={() => router.push('/dashboard/settings/integrations')}
+                  >
+                    Manage Integrations
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+                  >
+                    <RefreshCw size={12} className="mr-1" />
+                    Sync Now
+                  </Button>
                 </div>
               </CardContent>
             </Card>
