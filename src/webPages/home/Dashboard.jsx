@@ -49,7 +49,6 @@ import {
   Grid,
   MessageSquare,
   Video,
-  FileShare,
   Users2,
   Sparkles,
   Send,
@@ -62,8 +61,9 @@ import {
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
   Smartphone,
-  Database,
+
   Cloud,
+  Share,
 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -1195,6 +1195,275 @@ const DashboardPage = () => {
               </CardContent>
             </Card>
           </div>
+
+{/* Knowledge Center, Team & Access, Subscriptions Cards */}
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  {/* Knowledge Center Card */}
+  <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white h-[280px] flex flex-col">
+    <CardHeader className="pb-2 flex-shrink-0">
+      <div className="flex items-center gap-2">
+        <div className="p-1.5 bg-amber-100 rounded-lg">
+          <FileText className="h-4 w-4 text-amber-600" />
+        </div>
+        <CardTitle className="text-base font-semibold">Knowledge Center</CardTitle>
+      </div>
+      <CardDescription className="text-xs">Guides, tutorials, and documentation</CardDescription>
+    </CardHeader>
+    <CardContent className="flex-1 overflow-y-auto">
+      <div className="space-y-3">
+        {/* Featured Article */}
+        <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-sm transition-all cursor-pointer group">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Badge className="bg-blue-100 text-blue-700 text-[10px] px-1.5">Popular</Badge>
+                <span className="text-[10px] text-gray-400">5 min read</span>
+              </div>
+              <h4 className="font-medium text-sm text-gray-900 group-hover:text-blue-600 transition-colors">
+                Getting Started with Stocktake
+              </h4>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Learn the basics of conducting your first inventory count
+              </p>
+            </div>
+            <ChevronRight size={14} className="text-gray-400 group-hover:text-blue-500 mt-1" />
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div>
+          <p className="text-xs font-medium text-gray-700 mb-2">Quick Resources</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { name: "Video Tutorials", icon: Video, color: "text-red-500", bgColor: "bg-red-50" },
+              { name: "User Manual", icon: Share, color: "text-blue-500", bgColor: "bg-blue-50" },
+              { name: "FAQ", icon: MessageSquare, color: "text-green-500", bgColor: "bg-green-50" },
+              { name: "Release Notes", icon: Sparkles, color: "text-purple-500", bgColor: "bg-purple-50" },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className={cn("p-1 rounded-md", item.bgColor)}>
+                    <Icon size={12} className={item.color} />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">{item.name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Support */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2 border border-blue-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-white rounded-full shadow-sm">
+                <MessageCircle size={12} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-900">Need help?</p>
+                <p className="text-[10px] text-gray-500">24/7 Support available</p>
+              </div>
+            </div>
+            <Button size="sm" variant="link" className="text-xs text-blue-600 p-0 h-auto">
+              Contact Support →
+            </Button>
+          </div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+
+  {/* Team & Access Card */}
+  <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white h-[280px] flex flex-col">
+    <CardHeader className="pb-2 flex-shrink-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-indigo-100 rounded-lg">
+            <Shield className="h-4 w-4 text-indigo-600" />
+          </div>
+          <CardTitle className="text-base font-semibold">Team & Access</CardTitle>
+        </div>
+        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+          Role-based Access
+        </Badge>
+      </div>
+      <CardDescription className="text-xs">Manage team members and permissions</CardDescription>
+    </CardHeader>
+    <CardContent className="flex-1 overflow-y-auto">
+      <div className="space-y-3">
+        {/* Role Distribution */}
+        <div className="bg-white rounded-lg p-2 border border-gray-200">
+          <p className="text-xs font-medium text-gray-700 mb-2">Role Distribution</p>
+          <div className="space-y-1.5">
+            {[
+              { role: "Administrators", count: 3, color: "bg-purple-500" },
+              { role: "Managers", count: 8, color: "bg-blue-500" },
+              { role: "Auditors", count: 15, color: "bg-green-500" },
+              { role: "Viewers", count: 12, color: "bg-gray-500" },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <div className="flex justify-between text-xs mb-0.5">
+                  <span className="text-gray-600">{item.role}</span>
+                  <span className="font-medium text-gray-900">{item.count}</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div
+                    className={cn("h-1.5 rounded-full", item.color)}
+                    style={{ width: `${(item.count / 38) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Access Requests */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-medium text-gray-700">Pending Access Requests</p>
+            <Badge className="bg-amber-100 text-amber-700 text-[10px]">2 pending</Badge>
+          </div>
+          <div className="space-y-2">
+            {[
+              { name: "Alex Tan", role: "Auditor", time: "2 hours ago", avatar: "AT" },
+              { name: "Priya Patel", role: "Manager", time: "Yesterday", avatar: "PP" },
+            ].map((req, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="text-[10px] bg-indigo-100 text-indigo-700">
+                      {req.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-xs font-medium text-gray-900">{req.name}</p>
+                    <p className="text-[10px] text-gray-400">{req.role} • {req.time}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <Button size="sm" variant="ghost" className="h-6 px-2 text-green-600 text-xs hover:bg-green-50">
+                    Approve
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-6 px-2 text-red-600 text-xs hover:bg-red-50">
+                    Deny
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50 text-xs mt-1"
+          onClick={() => router.push('/dashboard/settings/team-access')}
+        >
+          Manage Team & Access →
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+
+  {/* Subscriptions Card */}
+  <Card className="border-gray-200 bg-gradient-to-br from-blue-50/50 to-white h-[280px] flex flex-col">
+    <CardHeader className="pb-2 flex-shrink-0">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-emerald-100 rounded-lg">
+            <Award className="h-4 w-4 text-emerald-600" />
+          </div>
+          <CardTitle className="text-base font-semibold">Subscriptions</CardTitle>
+        </div>
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
+          Active Plan
+        </Badge>
+      </div>
+      <CardDescription className="text-xs">Manage your plans and billing</CardDescription>
+    </CardHeader>
+    <CardContent className="flex-1 overflow-y-auto">
+      <div className="space-y-3">
+        {/* Current Plan */}
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-3 border border-emerald-100">
+          <div className="flex items-center justify-between mb-1">
+            <div>
+              <p className="text-xs font-semibold text-gray-900">Enterprise Plan</p>
+              <p className="text-[10px] text-gray-500">Annual billing • Renews Dec 31, 2024</p>
+            </div>
+            <Badge className="bg-emerald-200 text-emerald-800 text-[10px]">Active</Badge>
+          </div>
+          <div className="mt-2">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-600">Usage this month</span>
+              <span className="font-medium text-gray-900">68%</span>
+            </div>
+            <Progress value={68} className="h-1.5 bg-gray-200" />
+            <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+              <span>Used: 34/50 events</span>
+              <span>Remaining: 16 credits</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Add-ons */}
+        <div>
+          <p className="text-xs font-medium text-gray-700 mb-2">Active Add-ons</p>
+          <div className="space-y-2">
+            {[
+              { name: "Advanced Analytics", price: "$99/mo", status: "active" },
+              { name: "Priority Support", price: "$49/mo", status: "active" },
+              { name: "API Access", price: "$199/mo", status: "inactive" },
+            ].map((addon, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    addon.status === "active" ? "bg-green-500" : "bg-gray-300"
+                  )} />
+                  <span className="text-xs font-medium text-gray-900">{addon.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">{addon.price}</span>
+                  {addon.status === "active" ? (
+                    <Badge variant="outline" className="bg-green-50 text-green-700 text-[10px]">
+                      Active
+                    </Badge>
+                  ) : (
+                    <Button size="sm" variant="link" className="text-xs text-blue-600 p-0 h-auto">
+                      Add
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Billing Actions */}
+        <div className="flex gap-2 pt-1">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-xs"
+            onClick={() => router.push('/dashboard/settings/billing')}
+          >
+            Manage Billing
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+          >
+            <Download size={12} className="mr-1" />
+            Invoice History
+          </Button>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+
         </div>
 
         {/* Chat Dialog */}
