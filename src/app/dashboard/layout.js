@@ -21,14 +21,7 @@ const AdminLayout = ({ children }) => {
           isOpen={isMainSidebarOpen} 
           onToggle={() => setIsMainSidebarOpen(!isMainSidebarOpen)}
         />
-           {/* Secondary Sidebar - Adjacent to main content */}
-        {isSecondarySidebarOpen && (
-          <SecondarySidebar 
-            isOpen={isSecondarySidebarOpen}
-            onClose={closeSecondarySidebar}
-            eventData={selectedEventData}
-          />
-        )}
+        
 
         {/* Main Content Area */}
         <div className={cn(
@@ -40,10 +33,19 @@ const AdminLayout = ({ children }) => {
             isMainSidebarOpen={isMainSidebarOpen}
           />
           
-          <main className="flex-1 overflow-y-auto p-6 bg-[#F5EEE9]">
+          <main className="flex-1 overflow-y-auto p-4 bg-[#F5EEE9]">
             {children}
           </main>
         </div>
+
+           {/* Secondary Sidebar - Adjacent to main content */}
+        {isSecondarySidebarOpen && (
+          <SecondarySidebar 
+            isOpen={isSecondarySidebarOpen}
+            onClose={closeSecondarySidebar}
+            eventData={selectedEventData}
+          />
+        )}
 
      
       </div>

@@ -144,11 +144,11 @@ const MainSidebar = ({ isOpen, onToggle }) => {
   const [hoveredSection, setHoveredSection] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [expandedDashboard, setExpandedDashboard] = useState(false);
-  const [expandedStockTakeSetup, setExpandedStockTakeSetup] = useState(false);
-  const [expandedStockTakePlan, setExpandedStockTakePlan] = useState(false);
-  const [expandedStockTakeExecute, setExpandedStockTakeExecute] = useState(false);
-  const [expandedStockTakeReview, setExpandedStockTakeReview] = useState(false);
-  const [expandedStockTakeReconciliation, setExpandedStockTakeReconciliation] = useState(false);
+  // const [expandedStockTakeSetup, setExpandedStockTakeSetup] = useState(false);
+  // const [expandedStockTakePlan, setExpandedStockTakePlan] = useState(false);
+  // const [expandedStockTakeExecute, setExpandedStockTakeExecute] = useState(false);
+  // const [expandedStockTakeReview, setExpandedStockTakeReview] = useState(false);
+  // const [expandedStockTakeReconciliation, setExpandedStockTakeReconciliation] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -233,9 +233,9 @@ const menuSections = [
         { label: 'Event Scheduling', icon: Calendar, path: '/dashboard/stocktake/scheduler' },
         { label: 'Event Setup', icon: Settings, path: '/dashboard/stocktake/event-setup' },
       ]},
-      { label: 'Execute (LIVE)', icon: Play, submenu: [
+     
         { label: 'Live & Upcoming Events', icon: LayoutDashboard, path: '/dashboard/upcoming-events' },
-      ]},
+      
     ]
   },
   {
